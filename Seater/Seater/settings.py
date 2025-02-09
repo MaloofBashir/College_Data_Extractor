@@ -122,11 +122,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'Seater/Seating_Plan/static')  # Required for collectstatic
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'Seater/staticfiles'),  # Optional: Global static files
+]
 
 
 # Default primary key field type
