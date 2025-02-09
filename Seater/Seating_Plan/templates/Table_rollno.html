@@ -15,7 +15,7 @@
     </div>
     {% else %}
     <div class="container">
-        <h1>Attendance Sheet</h1> <a href="{% url 'export_excel'  %}" class="fancy-link">Generate Excel Sheet</a>
+        <h1>Attendance Sheet</h1> <a id="mylink" href="{% url 'export_excel'  %}" class="fancy-link">Generate Excel Sheet</a>
         <table>
             <thead>
                 <tr>
@@ -37,10 +37,17 @@
         </table>
         <div class="footer">
             <p>Attendance Sheet Generated on {{current_date_time}}</p>
-            <p>Developed and Maintained by Maloof Bashir...😂</p>
+            <p> Developed and Maintained by Penguin Battalion from GDC Zainapora ...😂</p>
         </div>
     </div>
     {% endif %}
 </body>
+<script>
+   
+   document.getElementById("mylink").addEventListener('click', function(event) {
+        event.preventDefault();  // Prevent the default link behavior
+        window.location.href = "{% url 'export_excel' %}";  // Redirect to the export_excel URL
+    });
 
+</script>
 </html>
