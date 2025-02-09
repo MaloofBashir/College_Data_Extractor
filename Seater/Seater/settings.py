@@ -128,9 +128,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, '/Seating_Plan/static')  # Required for collectstatic
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, '/staticfiles'),  # Optional: Global static files
-]
+
 
 
 # Default primary key field type
