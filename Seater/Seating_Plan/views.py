@@ -12,7 +12,7 @@ from django.http import HttpResponse
 
 
 
-
+new_dict={}
 
 
 # Create your views here.
@@ -20,6 +20,8 @@ def index(request):
     return render(request, 'index.html')
 
 def Table_rollno(request):
+
+    global new_dict
     context = {}
     date_time=datetime.now()
     context["current_date_time"]=date_time
@@ -31,8 +33,11 @@ def Table_rollno(request):
         except Exception:
             error_message = "Error in uploading the file, Please ensure you upload a Pdf-Attendance Sheet from KU"
             context["error"] = error_message
-
-        context["dictionary_of_subjects"] = dictionary_of_subjects
+        new_dict=dictionary_of_subjects.copy()
+        context["dictionary_of_subjects"] =new_dict
+        dictionary_of_subjects.clear()
+        
+        
         
         # Render the response and clear the dictionary after rendering
         response = render(request, 'Table_rollno.html', context)
@@ -46,13 +51,13 @@ def Table_rollno(request):
         return render(request, 'Table_rollno.html', context)
 
 def export_excel(request):
-    print("dictionary is:",dictionary_of_subjects)
+    # print("dictionary is:",new_dict)
     try:
         wb=Workbook()
         ws=wb.active
         ws.title="Sheet1"
         col=1
-        for key,values in dictionary_of_subjects.items():
+        for key,values in new_dict.items():
             ws.cell(row=1,column=col,value=key)
             for row, value in enumerate(values,start=2):
                 ws.cell(row=row,column=col,value=value)
