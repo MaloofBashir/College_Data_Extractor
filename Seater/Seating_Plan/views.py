@@ -25,8 +25,9 @@ def index(request):
 
 def Table_rollno(request):
     
-    global new_dict,filtered_data
+    global new_dict,filtered_data,center_nos
     context = {}
+    center_nos.clear()
     merged_data={}
     date_time=datetime.now()
     context["current_date_time"]=date_time
@@ -57,8 +58,12 @@ def Table_rollno(request):
     
     if request.method == 'POST' and 'file' in request.FILES:
         filtered=False
+        filtered_data.clear()
+        merged_data.clear()
+        new_dict.clear()
+
         
-        center_nos=[]
+        center_nos.clear()
         uploaded_file = request.FILES['file'] 
         try:
            
@@ -70,7 +75,7 @@ def Table_rollno(request):
         new_dict.update(json_data.copy())
         merged_data=merge_rolls(new_dict)
         filtered_data.update(merged_data.copy())
-        print("is ifltered data getting popultated",filtered_data)
+        # print("is ifltered data getting popultated",filtered_data)
         context["dictionary_of_subjects"] =merged_data.copy()
         # print(new_dict)
         
