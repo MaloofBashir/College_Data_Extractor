@@ -123,3 +123,61 @@ a:hover{
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
     transform: translateY(-2px); /* Slight lift effect */
 }
+
+
+.filter-container {
+   margin: 20px 20px;
+   display: flex;
+   align-items: center;
+   gap: 10px;
+   float: right; /* Add this to move container to right */
+}
+.filter-container label {
+display: inline-block;
+padding: 12px 25px;
+font-size: 16px;
+   color: #0a0000;
+   background-color: #e0e6ec;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   transition: all 0.3s ease;
+}
+
+#filter-dropdown {
+display: inline-block;
+padding: 12px 25px;
+font-size: 16px;
+color: #fff;
+background-color: #007bff;
+border: none;
+border-radius: 5px;
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+transition: all 0.3s ease;
+cursor: pointer;
+/* Add these properties for a custom dropdown arrow */
+appearance: none;
+-webkit-appearance: none;
+-moz-appearance: none;
+background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+background-repeat: no-repeat;
+background-position: right 10px center;
+background-size: 20px;
+padding-right: 40px;
+}
+#filter-dropdown:hover {
+background-color: #0056b3;
+box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+transform: translateY(-2px);
+}
+#filter-dropdown:focus {
+outline: none;
+box-shadow: 0 0 0 2px rgba(38, 143, 255, 0.6);
+}
+
+#filter-dropdown option {
+
+background-color: white;
+color: #333;
+padding: 12px 25px;
+}
+
+

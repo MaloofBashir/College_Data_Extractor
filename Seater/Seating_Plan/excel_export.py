@@ -85,18 +85,7 @@ def getting_all_subs(pdffile):
         for pageno in range(num_pages):
             subs_of_current_candidate=get_subname(pdf_obj,pageno)
 
-#looping through all subject in the document one by one
-#This if the first function to run
 
-
-# def excel_export(file):
-#     print(file)
-#     getting_all_subs(file)
-#     for colno,subject in enumerate(all_sub_names):
-#         add_subject_to_sheet(subject,colno+1,file)
-#     excel_filename="myfile.xlsx"
-#     wb.save(excel_filename)
-#     return excel_filename
 
 import openpyxl
 import io

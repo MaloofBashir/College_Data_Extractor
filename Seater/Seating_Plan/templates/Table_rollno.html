@@ -1,11 +1,69 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'Table_Rollno.css' %}">
+<link rel="stylesheet" href="{% static 'Seating_Plan/Table_Rollno.css' %}">
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance Sheet</title> 
+
+    <style>
+     .filter-container {
+        margin: 20px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        float: right; /* Add this to move container to right */
+    }
+.filter-container label {
+    display: inline-block;
+    padding: 12px 25px;
+    font-size: 16px;
+        color: #0a0000;
+        background-color: #e0e6ec;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    #filter-dropdown {
+    display: inline-block;
+    padding: 12px 25px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    /* Add these properties for a custom dropdown arrow */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+    padding-right: 40px;
+}
+#filter-dropdown:hover {
+    background-color: #0056b3;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+#filter-dropdown:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(38, 143, 255, 0.6);
+}
+
+#filter-dropdown option {
+    
+    background-color: white;
+    color: #333;
+    padding: 12px 25px;
+}
+    </style>
     
 </head>
 <body>
@@ -16,6 +74,17 @@
     {% else %}
     <div class="container">
         <h1>Attendance Sheet</h1> <a id="mylink" href="{% url 'export_excel'  %}" class="fancy-link">Generate Excel Sheet</a>
+
+        <div class="filter-container">
+            <label for="filter-dropdown">Filter By Centre Number:</label>
+            <select id="filter-dropdown">
+                <option value="default">All</option>
+                {% for center_no in centre_nos %}
+                <option value="{{ center_no }}">{{ center_no }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
         <table>
             <thead>
                 <tr>
@@ -24,8 +93,8 @@
                     <th>Total Count</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for subject,roll_numbers in dictionary_of_subjects.items %}
+            <tbody id="table-body">
+                    {% for subject,roll_numbers in dictionary_of_subjects.items %}
                 <tr>
                     <td>{{ subject }}</td>
 
@@ -48,6 +117,58 @@
         event.preventDefault();  // Prevent the default link behavior
         window.location.href = "{% url 'export_excel' %}";  // Redirect to the export_excel URL
     });
+ 
+
+
+    document.getElementById('filter-dropdown').addEventListener('change', function() {
+    var selectedValue = this.value; // Get selected center number
+    console.log("Selected Value: ", selectedValue); // Debugging log
+
+    // Create an AJAX request
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', `/Table_rollno/?filter=${selectedValue}`, true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // Important: Identifies request as AJAX
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            console.log("Received Data: ", data); // Debugging log
+
+            // Clear the existing table rows
+            var tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+
+            // Repopulate the table with the new data
+            data.forEach(function(item) {
+                console.log("`item is ${item}`")
+                var row = document.createElement('tr');
+
+                var subjectCell = document.createElement('td');
+                subjectCell.textContent = item.subject;
+                row.appendChild(subjectCell);
+
+                var rollNumbersCell = document.createElement('td');
+                rollNumbersCell.textContent = item.roll_numbers.join(', ');
+                row.appendChild(rollNumbersCell);
+
+                var totalCountCell = document.createElement('td');
+                totalCountCell.textContent = item.roll_numbers.length;
+                totalCountCell.classList.add('total-count');
+                row.appendChild(totalCountCell);
+
+                tableBody.appendChild(row);
+            });
+        } else {
+            console.error('Error fetching data');
+        }
+    };
+
+    xhr.onerror = function() {
+        console.error("Request failed");
+    };
+
+    xhr.send(); // Send the request
+});
 
 </script>
 </html>

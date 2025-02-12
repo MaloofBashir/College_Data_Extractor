@@ -90,12 +90,12 @@ cursor: pointer;
 /* Style for the fancy link */
 .fancy-link {
     display: inline-block;
-    padding: 12px 25px;          /* Add some padding for a button-like look */
+    padding: 120px 20px;          /* Add some padding for a button-like look */
     font-size: 16px;              /* Font size */
     color: #fff;                 /* Text color */
     background-color: #007bff;   /* Blue background */
     text-decoration: none;       /* Remove the underline */
-    border-radius: 5px;          /* Rounded corners */
+    border-radius: 2px;          /* Rounded corners */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
     transition: all 0.3s ease;   /* Smooth transition for hover effects */
 }
@@ -122,4 +122,42 @@ a:hover{
     background-color: green;   /* Darker blue on hover */
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
     transform: translateY(-2px); /* Slight lift effect */
+}
+
+.filter-container {
+    margin: 20px 200px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Style for the filter dropdown */
+.filter-dropdown {
+    display: inline-block;
+    padding: 12px 25px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+#filter-dropdown:hover {
+    background-color: #0056b3;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+#filter-dropdown:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(38, 143, 255, 0.6);
+}
+
+#filter-dropdown option {
+    background-color: white;
+    color: #333;
+    padding: 12px 25px;
 }
