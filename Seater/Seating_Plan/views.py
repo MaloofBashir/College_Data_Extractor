@@ -37,7 +37,7 @@ def Table_rollno(request):
         filtered=True
         current_data_of_centre=[]
         filtered_data={}
-        print("hello ajax")
+        
         filter_value = request.GET.get('filter', '')
         
         
@@ -75,9 +75,9 @@ def Table_rollno(request):
         new_dict.update(json_data.copy())
         merged_data=merge_rolls(new_dict)
         filtered_data.update(merged_data.copy())
-        # print("is ifltered data getting popultated",filtered_data)
+        
         context["dictionary_of_subjects"] =merged_data.copy()
-        # print(new_dict)
+        
         
         context["centre_nos"] = list(new_dict.keys())
         print("centre_number",center_nos)
@@ -105,7 +105,7 @@ def export_excel(request):
         ws.title="Sheet1"
         col=1
         
-        print("filtered_data is",filtered_data)
+      
         for key,values in filtered_data.items():
             ws.cell(row=1,column=col,value=key)
             for row, value in enumerate(values,start=2):
@@ -119,7 +119,7 @@ def export_excel(request):
         response['Content-Disposition'] = f'attachment; filename="{file_name}"'
         return response
     except Exception as e:
-        print(f"Error: {e}")
+     
         return HttpResponse("Something went wrong", status=500)
 
 

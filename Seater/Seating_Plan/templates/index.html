@@ -7,16 +7,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Attendance Sheet</title>
+    
 </head>
+<style>
+    .footer {
+    position: fixed;  /* Sticks the footer at the bottom */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #f1f1f1; /* Light gray background */
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.warning {
+            color: red;
+            /* background-color: red; */
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+</style>
+
 <body>
     <div class="upload-container">
         <div class="upload-icon">&#128194;</div>
         <h1>Upload Attendance Sheet</h1>
+        <p style="color: rgb(227, 116, 116); font-weight: bold;">
+            ⚠️ Only upload attendance sheets from the KU website with  "AttendanceSheetsBySubnames" checkbox **disabled** (*unchecked*).
+        </p>
         <form action="{% url 'Table_rollno' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="file" id="file-input" name="file">
             <button type="submit">Upload</button>
         </form>
     </div>
+   
 </body>
+<div class="footer">
+    <!-- <p>Attendance Sheet Generated on {{current_date_time}}</p> -->
+    <p> &copy; MB,GDC Zainapora All Rights Reserved.</p>
+    <p> Contact No: 9103295487 </p>
+   
+</div>
 </html>

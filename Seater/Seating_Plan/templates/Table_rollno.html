@@ -63,6 +63,20 @@
     color: #333;
     padding: 12px 25px;
 }
+
+#contact{
+    display: grid;
+    grid-template-columns: 1fr; /* Two equal columns */
+    gap: 10px;
+}
+
+.contact-info {
+    display: flex;
+    justify-content: center; /* Center align content */
+    gap: 30px; /* Space between phone and email */
+    font-size: 14px;
+    color: gray;
+}
     </style>
     
 </head>
@@ -106,7 +120,10 @@
         </table>
         <div class="footer">
             <p>Attendance Sheet Generated on {{current_date_time}}</p>
-            <p> Developed and Maintained by Penguin Battalion GDC Zainapora ..</p>
+            <p> &copy; 2025 MB, GDC Zainapora. All Rights Reserved.</p>
+            <div class="contact-info">
+                <span>Contact No: 9103295487</span>
+            </div>
         </div>
     </div>
     {% endif %}
@@ -122,7 +139,7 @@
 
     document.getElementById('filter-dropdown').addEventListener('change', function() {
     var selectedValue = this.value; // Get selected center number
-    console.log("Selected Value: ", selectedValue); // Debugging log
+    
 
     // Create an AJAX request
     var xhr = new XMLHttpRequest();
@@ -132,7 +149,7 @@
     xhr.onload = function() {
         if (xhr.status === 200) {
             var data = JSON.parse(xhr.responseText);
-            console.log("Received Data: ", data); // Debugging log
+            
 
             // Clear the existing table rows
             var tableBody = document.getElementById('table-body');
@@ -140,7 +157,7 @@
 
             // Repopulate the table with the new data
             data.forEach(function(item) {
-                console.log("`item is ${item}`")
+              
                 var row = document.createElement('tr');
 
                 var subjectCell = document.createElement('td');
