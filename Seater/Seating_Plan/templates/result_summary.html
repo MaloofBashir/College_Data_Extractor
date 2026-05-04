@@ -1,0 +1,119 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'Table_Rollno.css' %}">
+<link rel="stylesheet" href="{% static 'Seating_Plan/Table_Rollno.css' %}">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result Summary</title>
+    <style>
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .summary-card {
+            padding: 18px;
+            border-radius: 10px;
+            background: #f5f8ff;
+            border: 1px solid #d8e4ff;
+            text-align: center;
+        }
+
+        .summary-card h2 {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+
+        .summary-card p {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+            color: #0056b3;
+        }
+
+        .top-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .note {
+            margin-top: 18px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-links">
+            <h1>Result Pass Percentage Summary</h1>
+            <a href="{% url 'index' %}" class="fancy-link">Back to Home</a>
+        </div>
+
+        {% if error %}
+        <div class="error-message">
+            <p>{{ error }}</p>
+        </div>
+        {% elif summary %}
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h2>Total Students</h2>
+                <p>{{ summary.total_students }}</p>
+            </div>
+            <div class="summary-card">
+                <h2>Overall Passed</h2>
+                <p>{{ summary.overall_passed }}</p>
+            </div>
+            <div class="summary-card">
+                <h2>Overall Failed</h2>
+                <p>{{ summary.overall_failed }}</p>
+            </div>
+            <div class="summary-card">
+                <h2>Overall Pass %</h2>
+                <p>{{ summary.overall_pass_percentage }}%</p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Students Appeared</th>
+                    <th>Students Passed</th>
+                    <th>Students Failed</th>
+                    <th>Pass Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in summary.subjects %}
+                <tr>
+                    <td>{{ item.subject }}</td>
+                    <td>{{ item.appeared }}</td>
+                    <td>{{ item.passed }}</td>
+                    <td>{{ item.failed }}</td>
+                    <td class="total-count">{{ item.pass_percentage }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <p>Result summary generated on {{ current_date_time }}</p>
+            <p>Pages with detected subject rows: {{ summary.parsed_pages }}</p>
+        </div>
+        {% else %}
+        <div class="summary-card">
+            <h2>Upload Required</h2>
+            <p style="font-size: 16px; color: #333;">Please upload a result PDF from the home page to generate the summary.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

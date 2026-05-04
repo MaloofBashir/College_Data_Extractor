@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, FileResponse
 from .seating import getting_all_subs,json_data,merge_rolls
+from .result_parser import summarize_result_pdf
 from django.core.cache import cache
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
@@ -22,6 +23,24 @@ filtered=False
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
+
+
+def result_summary(request):
+    context = {
+        "current_date_time": datetime.now(),
+    }
+
+    if request.method == 'POST' and 'file' in request.FILES:
+        uploaded_file = request.FILES['file']
+        try:
+            context["summary"] = summarize_result_pdf(uploaded_file)
+        except Exception:
+            context["error"] = (
+                "Error in uploading the result PDF. Please ensure you upload a KU result PDF in the expected format."
+            )
+        return render(request, 'result_summary.html', context)
+
+    return render(request, 'result_summary.html', context)
 
 def Table_rollno(request):
     
@@ -121,5 +140,4 @@ def export_excel(request):
     except Exception as e:
      
         return HttpResponse("Something went wrong", status=500)
-
 

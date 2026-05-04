@@ -3,9 +3,11 @@ body {
     background-color: #f3f4f6;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    align-items: flex-start;
+    min-height: 100vh;
     margin: 0;
+    padding: 40px 20px 120px;
+    box-sizing: border-box;
 }
 .upload-container {
     background: #ffffff;
@@ -15,6 +17,56 @@ body {
     text-align: center;
     width: 100%;
     max-width: 500px;
+}
+
+.home-grid {
+    max-width: 1100px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+.tool-card {
+    padding: 24px;
+    border: 1px solid #dbe5f1;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.tool-badge {
+    display: inline-block;
+    margin-bottom: 14px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.attendance-badge {
+    background-color: #e8f7eb;
+    color: #1f7a35;
+}
+
+.result-badge {
+    background-color: #e8f0ff;
+    color: #1e5bb8;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 20px 12px 120px;
+    }
+
+    .upload-container {
+        padding: 24px;
+    }
+
+    .home-grid {
+        grid-template-columns: 1fr;
+    }
 }
 .upload-container h1 {
     font-size: 28px;
@@ -65,4 +117,3 @@ body {
     align-items: center;
     gap: 10px;
 }
-

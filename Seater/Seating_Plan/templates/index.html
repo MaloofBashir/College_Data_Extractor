@@ -1,5 +1,5 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'styles.css' %}">
+<link rel="stylesheet" href="{% static 'Seating_Plan/styles.css' %}">
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,7 +11,7 @@
 </head>
 <style>
     .footer {
-    position: fixed;  /* Sticks the footer at the bottom */
+    position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
@@ -19,6 +19,7 @@
     text-align: center;
     padding: 10px;
     font-size: 14px;
+    z-index: 10;
 }
 
 .warning {
@@ -31,19 +32,79 @@
         }
 
 </style>
+<style>
+    .home-grid {
+        max-width: 1100px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+    }
+
+    .tool-card {
+        padding: 24px;
+        border: 1px solid #dbe5f1;
+        border-radius: 16px;
+        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .tool-badge {
+        display: inline-block;
+        margin-bottom: 14px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: bold;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+    }
+
+    .attendance-badge {
+        background-color: #e8f7eb;
+        color: #1f7a35;
+    }
+
+    .result-badge {
+        background-color: #e8f0ff;
+        color: #1e5bb8;
+    }
+
+    @media (max-width: 768px) {
+        .home-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 
 <body>
-    <div class="upload-container">
-        <div class="upload-icon">&#128194;</div>
-        <h1>Upload Attendance Sheet</h1>
-        <p style="color: rgb(227, 116, 116); font-weight: bold;">
-            ⚠️ Only upload attendance sheets from the KU website with  "AttendanceSheetsBySubnames" checkbox **disabled** (*unchecked*).
-        </p>
-        <form action="{% url 'Table_rollno' %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="file" id="file-input" name="file">
-            <button type="submit">Upload</button>
-        </form>
+    <div class="upload-container home-grid">
+        <div class="tool-card">
+            <div class="tool-badge attendance-badge">Attendance PDF</div>
+            <div class="upload-icon">&#128194;</div>
+            <h1>Extract Roll Numbers</h1>
+            <p style="color: rgb(227, 116, 116); font-weight: bold;">
+                Only upload attendance sheets from the KU website with "AttendanceSheetsBySubnames" unchecked.
+            </p>
+            <form action="{% url 'Table_rollno' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" id="attendance-file-input" name="file" required>
+                <button type="submit">Upload Attendance PDF</button>
+            </form>
+        </div>
+
+        <div class="tool-card">
+            <div class="tool-badge result-badge">Result PDF</div>
+            <div class="upload-icon">&#128202;</div>
+            <h1>Calculate Pass Percentage</h1>
+            <p style="color: #555; font-weight: bold;">
+                Upload the result PDF to see subject-wise passed students and pass percentage summary.
+            </p>
+            <form action="{% url 'result_summary' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" id="result-file-input" name="file" required>
+                <button type="submit">Upload Result PDF</button>
+            </form>
+        </div>
     </div>
    
 </body>
