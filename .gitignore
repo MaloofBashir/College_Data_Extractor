@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+
+db.sqlite3
+Seater/db.sqlite3
+
+Seater/results.pdf
+
+Seater/staticfiles/Seating_Plan/css/
