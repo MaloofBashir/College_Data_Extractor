@@ -6,186 +6,542 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Sheet</title> 
-
+    <title>Attendance Roll Summary</title>
     <style>
-     .filter-container {
-        margin: 20px 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        float: right; /* Add this to move container to right */
-    }
-.filter-container label {
-    display: inline-block;
-    padding: 12px 25px;
-    font-size: 16px;
-        color: #0a0000;
-        background-color: #e0e6ec;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
+        body {
+            background: linear-gradient(180deg, #f5f9ff 0%, #ffffff 35%, #f8fbff 100%);
+        }
 
-    #filter-dropdown {
-    display: inline-block;
-    padding: 12px 25px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    /* Add these properties for a custom dropdown arrow */
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 20px;
-    padding-right: 40px;
-}
-#filter-dropdown:hover {
-    background-color: #0056b3;
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-}
-#filter-dropdown:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(38, 143, 255, 0.6);
-}
+        .page-shell {
+            max-width: 1260px;
+            margin: 30px auto;
+            padding: 0 20px 40px;
+        }
 
-#filter-dropdown option {
-    
-    background-color: white;
-    color: #333;
-    padding: 12px 25px;
-}
+        .hero-card {
+            background: linear-gradient(135deg, #12607c 0%, #2487a8 52%, #d9f1f8 100%);
+            color: #fff;
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 18px 40px rgba(18, 96, 124, 0.18);
+            margin-bottom: 24px;
+        }
 
-#contact{
-    display: grid;
-    grid-template-columns: 1fr; /* Two equal columns */
-    gap: 10px;
-}
+        .hero-card h1 {
+            margin: 0 0 10px;
+            font-size: 34px;
+        }
 
-.contact-info {
-    display: flex;
-    justify-content: center; /* Center align content */
-    gap: 30px; /* Space between phone and email */
-    font-size: 14px;
-    color: gray;
-}
+        .hero-card p {
+            margin: 0;
+            max-width: 760px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .hero-actions,
+        .filter-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .hero-actions {
+            margin-top: 20px;
+        }
+
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            color: #fff;
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .action-button.secondary {
+            background: #fff;
+            color: #12607c;
+            border-color: #fff;
+        }
+
+        .action-button.dark {
+            background: #12607c;
+            color: #fff;
+            border-color: #12607c;
+        }
+
+        .meta-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .meta-pill {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            font-size: 14px;
+        }
+
+        .section-card {
+            background: #fff;
+            border: 1px solid #dde8f2;
+            border-radius: 22px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+        }
+
+        .section-card {
+            padding: 22px;
+            margin-bottom: 22px;
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .section-title h2 {
+            margin: 0;
+            color: #15495f;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            background: #ecf8fc;
+            color: #15516a;
+        }
+
+        .filter-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .filter-box {
+            padding: 18px;
+            border-radius: 18px;
+            background: linear-gradient(180deg, #fbfeff 0%, #eef9fc 100%);
+            border: 1px solid #d5eaf1;
+        }
+
+        .filter-box h3 {
+            margin-top: 0;
+            color: #15516a;
+        }
+
+        .centre-select {
+            width: 100%;
+            max-width: 320px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid #cfe1e8;
+            background: #fff;
+            color: #15495f;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .subject-chip-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .subject-chip {
+            position: relative;
+        }
+
+        .subject-chip input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .subject-chip label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
+            border-radius: 999px;
+            background: #f2fbfd;
+            border: 1px solid #d2e9ef;
+            color: #15516a;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .subject-chip input:checked + label {
+            background: linear-gradient(135deg, #12607c 0%, #2487a8 100%);
+            color: #fff;
+            border-color: #12607c;
+            box-shadow: 0 10px 18px rgba(18, 96, 124, 0.18);
+        }
+
+        .hint {
+            color: #627b8a;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .chip-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chip {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: #eaf7fb;
+            color: #15516a;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .roll-panel {
+            min-height: 220px;
+        }
+
+        .roll-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .roll-pill {
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: #f3fbfd;
+            border: 1px solid #d6ecf2;
+            color: #15495f;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .wide-table-wrap {
+            overflow-x: auto;
+        }
+
+        .wide-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 920px;
+        }
+
+        .wide-table th,
+        .wide-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e6eef5;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .wide-table th {
+            background: #edf9fc;
+            color: #1d5f79;
+            position: sticky;
+            top: 0;
+        }
+
+        .subject-wise-rolls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .subject-roll-card {
+            border: 1px solid #dbe8f1;
+            border-radius: 18px;
+            background: linear-gradient(180deg, #fcfeff 0%, #f0fbfd 100%);
+            padding: 18px;
+        }
+
+        .subject-roll-card h3 {
+            margin: 0 0 8px;
+            color: #15516a;
+        }
+
+        .subject-roll-meta {
+            color: #5f7b87;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .subject-roll-values {
+            font-weight: 700;
+            color: #1f3f50;
+            line-height: 1.8;
+            word-break: break-word;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 24px;
+            background: #fff;
+            border: 1px solid #dde8f2;
+            border-radius: 22px;
+        }
+
+        @media (max-width: 960px) {
+            .filter-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-card h1 {
+                font-size: 28px;
+            }
+        }
     </style>
-    
 </head>
 <body>
-    {% if error_message %}
-    <div class="error-message">
-        <p>{{ error_message }}</p>
-    </div>
-    {% else %}
-    <div class="container">
-        <h1>Attendance Sheet</h1> <a id="mylink" href="{% url 'export_excel'  %}" class="fancy-link">Generate Excel Sheet</a>
-
-        <div class="filter-container">
-            <label for="filter-dropdown">Filter By Centre Number:</label>
-            <select id="filter-dropdown">
-                <option value="default">All</option>
-                {% for center_no in centre_nos %}
-                <option value="{{ center_no }}">{{ center_no }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Subject Name</th>
-                    <th>Roll Numbers</th>
-                    <th>Total Count</th>
-                </tr>
-            </thead>
-            <tbody id="table-body">
-                    {% for subject,roll_numbers in dictionary_of_subjects.items %}
-                <tr>
-                    <td>{{ subject }}</td>
-
-                    <td>{% for roll_number in roll_numbers %} {{roll_number}}, {% endfor %}</td>
-                    <td class="total-count">{{ roll_numbers|length }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <div class="footer">
-            <p>Attendance Sheet Generated on {{current_date_time}}</p>
-            <p> &copy; 2025 MB, GDC Zainapora. All Rights Reserved.</p>
-            <div class="contact-info">
-                <span>Contact No: 9103295487</span>
+    <div class="page-shell">
+        {% if error %}
+        <div class="section-card">
+            <div class="error-message">
+                <p>{{ error }}</p>
+            </div>
+            <div class="hero-actions" style="margin-top: 16px;">
+                <a href="{% url 'index' %}" class="action-button dark">Back to Home</a>
             </div>
         </div>
+        {% elif attendance_summary %}
+        <div class="hero-card">
+            <h1>Attendance Roll Number Summary</h1>
+            <p>
+                This section now gives you a proper summary page, lets you filter by one or more subjects, shows the combined filtered roll numbers, and lets you download the filtered view as PDF or Excel.
+            </p>
+            <div class="hero-actions">
+                <a href="{% url 'index' %}" class="action-button secondary">Upload Another PDF</a>
+            </div>
+            <div class="meta-strip">
+                <div class="meta-pill">Generated: {{ attendance_generated_at|default:current_date_time }}</div>
+                <div class="meta-pill">Centres: {{ attendance_summary.centre_count }}</div>
+                <div class="meta-pill">Subjects: {{ attendance_summary.subject_count }}</div>
+                <div class="meta-pill">Unique rolls: {{ attendance_summary.total_unique_rolls }}</div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-title">
+                <h2>Subject Filter & Memo Rolls</h2>
+                <span class="badge">Instant subject filter</span>
+            </div>
+            <div class="filter-layout">
+                <div class="filter-box">
+                    <h3>Select centre first</h3>
+                    <select id="centre-picker" class="centre-select">
+                        {% for centre_no in centre_nos %}
+                        <option value="{{ centre_no }}" {% if attendance_summary.selected_centre == centre_no %}selected{% endif %}>Centre {{ centre_no }}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="hint">All roll numbers below will belong only to the selected centre.</p>
+                </div>
+
+                <div class="filter-box">
+                    <h3>Select subjects</h3>
+                    <div id="subject-picker" class="subject-chip-grid">
+                        {% for subject in all_subject_names %}
+                        <div class="subject-chip">
+                            <input type="checkbox" id="subject-{{ forloop.counter }}" value="{{ subject }}">
+                            <label for="subject-{{ forloop.counter }}">{{ subject }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <p class="hint">Just click subjects one by one. The roll numbers update automatically.</p>
+                    <div class="filter-actions" style="margin-top: 16px;">
+                        <button type="button" class="action-button dark" id="clear-filter-btn">Show All Subjects</button>
+                        <a id="download-pdf-btn" href="{% url 'download_attendance_pdf' %}" class="action-button dark">Download Filtered PDF</a>
+                        <a id="download-excel-btn" href="{% url 'export_excel' %}" class="action-button dark">Download Filtered Excel</a>
+                    </div>
+                </div>
+
+                <div class="filter-box roll-panel">
+                    <h3>Selected Subjects</h3>
+                    <div id="selected-subject-chips" class="chip-cloud">
+                        {% for subject in attendance_summary.selected_subjects %}
+                        <span class="chip">{{ subject }}</span>
+                        {% endfor %}
+                    </div>
+                    <h3 style="margin-top: 18px;">Memo Roll Numbers</h3>
+                    <p class="hint">These are the combined rolls from the selected subjects in the chosen centre, shown for easy reading and memo entry.</p>
+                    <div id="selected-rolls" class="roll-list">
+                        {% for roll in attendance_summary.selected_rolls %}
+                        <span class="roll-pill">{{ roll }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-title">
+                <h2>Subject-wise Roll Numbers</h2>
+                <span class="badge">Keep this visible</span>
+            </div>
+            <div id="subject-summary-body" class="subject-wise-rolls">
+                {% for item in attendance_summary.filtered_subjects %}
+                <div class="subject-roll-card">
+                    <h3>{{ item.subject }}</h3>
+                    <div class="subject-roll-meta">{{ item.count }} rolls | {{ item.centre_count }} centres</div>
+                    <div class="subject-roll-values">{{ item.roll_numbers|join:", " }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h2>Upload Required</h2>
+            <p>Please upload an attendance PDF from the home page to generate the roll number summary.</p>
+            <div class="hero-actions" style="justify-content: center;">
+                <a href="{% url 'index' %}" class="action-button dark">Back to Home</a>
+            </div>
+        </div>
+        {% endif %}
     </div>
+
+    {% if attendance_summary %}
+    <script>
+        const subjectPicker = document.getElementById("subject-picker");
+        const centrePicker = document.getElementById("centre-picker");
+        const clearFilterBtn = document.getElementById("clear-filter-btn");
+        const subjectSummaryBody = document.getElementById("subject-summary-body");
+        const selectedRolls = document.getElementById("selected-rolls");
+        const selectedSubjectChips = document.getElementById("selected-subject-chips");
+        const downloadPdfBtn = document.getElementById("download-pdf-btn");
+        const downloadExcelBtn = document.getElementById("download-excel-btn");
+
+        function getSelectedSubjects() {
+            return Array.from(subjectPicker.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
+        }
+
+        function buildFilterQuery() {
+            const subjects = getSelectedSubjects();
+            const params = new URLSearchParams();
+            if (centrePicker.value) {
+                params.set("centre", centrePicker.value);
+            }
+            if (subjects.length) {
+                params.set("subjects", subjects.join(","));
+            }
+            const query = params.toString();
+            return query ? `?${query}` : "";
+        }
+
+        function updateDownloadLinks() {
+            const query = buildFilterQuery();
+            downloadPdfBtn.href = "{% url 'download_attendance_pdf' %}" + query;
+            downloadExcelBtn.href = "{% url 'export_excel' %}" + query;
+        }
+
+        function renderChips(subjects) {
+            selectedSubjectChips.innerHTML = "";
+            subjects.forEach(subject => {
+                const chip = document.createElement("span");
+                chip.className = "chip";
+                chip.textContent = subject;
+                selectedSubjectChips.appendChild(chip);
+            });
+        }
+
+        function renderRolls(rolls) {
+            selectedRolls.innerHTML = "";
+            rolls.forEach(roll => {
+                const pill = document.createElement("span");
+                pill.className = "roll-pill";
+                pill.textContent = roll;
+                selectedRolls.appendChild(pill);
+            });
+        }
+
+        function renderSubjectPicker(subjects) {
+            subjectPicker.innerHTML = "";
+            subjects.forEach((subject, index) => {
+                const wrapper = document.createElement("div");
+                wrapper.className = "subject-chip";
+                const id = `subject-dynamic-${index}`;
+                wrapper.innerHTML = `
+                    <input type="checkbox" id="${id}" value="${subject}">
+                    <label for="${id}">${subject}</label>
+                `;
+                subjectPicker.appendChild(wrapper);
+            });
+        }
+
+        function renderTable(subjects) {
+            subjectSummaryBody.innerHTML = "";
+            subjects.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "subject-roll-card";
+                card.innerHTML = `
+                    <h3>${item.subject}</h3>
+                    <div class="subject-roll-meta">${item.count} rolls | ${item.centre_count} centres</div>
+                    <div class="subject-roll-values">${item.roll_numbers.join(", ")}</div>
+                `;
+                subjectSummaryBody.appendChild(card);
+            });
+        }
+
+        function applyFilters() {
+            updateDownloadLinks();
+            fetch(`/Table_rollno/${buildFilterQuery()}`, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    return;
+                }
+                renderChips(data.selected_subjects);
+                renderRolls(data.selected_rolls);
+                renderTable(data.subjects);
+                renderSubjectPicker(data.available_subjects);
+                data.selected_subjects.forEach(subject => {
+                    const input = subjectPicker.querySelector(`input[value="${CSS.escape(subject)}"]`);
+                    if (input) {
+                        input.checked = true;
+                    }
+                });
+                updateDownloadLinks();
+            })
+            .catch(error => console.error("Filter request failed", error));
+        }
+
+        clearFilterBtn.addEventListener("click", function() {
+            Array.from(subjectPicker.querySelectorAll('input[type="checkbox"]')).forEach(input => {
+                input.checked = false;
+            });
+            applyFilters();
+        });
+
+        subjectPicker.addEventListener("change", applyFilters);
+        centrePicker.addEventListener("change", function() {
+            Array.from(subjectPicker.querySelectorAll('input[type="checkbox"]')).forEach(input => {
+                input.checked = false;
+            });
+            applyFilters();
+        });
+        updateDownloadLinks();
+    </script>
     {% endif %}
 </body>
-<script>
-   
-   document.getElementById("mylink").addEventListener('click', function(event) {
-        event.preventDefault();  // Prevent the default link behavior
-        window.location.href = "{% url 'export_excel' %}";  // Redirect to the export_excel URL
-    });
- 
-
-
-    document.getElementById('filter-dropdown').addEventListener('change', function() {
-    var selectedValue = this.value; // Get selected center number
-    
-
-    // Create an AJAX request
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', `/Table_rollno/?filter=${selectedValue}`, true);
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // Important: Identifies request as AJAX
-
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            var data = JSON.parse(xhr.responseText);
-            
-
-            // Clear the existing table rows
-            var tableBody = document.getElementById('table-body');
-            tableBody.innerHTML = '';
-
-            // Repopulate the table with the new data
-            data.forEach(function(item) {
-              
-                var row = document.createElement('tr');
-
-                var subjectCell = document.createElement('td');
-                subjectCell.textContent = item.subject;
-                row.appendChild(subjectCell);
-
-                var rollNumbersCell = document.createElement('td');
-                rollNumbersCell.textContent = item.roll_numbers.join(', ');
-                row.appendChild(rollNumbersCell);
-
-                var totalCountCell = document.createElement('td');
-                totalCountCell.textContent = item.roll_numbers.length;
-                totalCountCell.classList.add('total-count');
-                row.appendChild(totalCountCell);
-
-                tableBody.appendChild(row);
-            });
-        } else {
-            console.error('Error fetching data');
-        }
-    };
-
-    xhr.onerror = function() {
-        console.error("Request failed");
-    };
-
-    xhr.send(); // Send the request
-});
-
-</script>
 </html>

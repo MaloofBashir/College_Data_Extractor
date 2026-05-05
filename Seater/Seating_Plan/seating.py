@@ -72,4 +72,56 @@ def merge_rolls(data):
     return {subject: sorted(list(rolls)) for subject, rolls in merged_subjects.items()}
 
 
+def sorted_centres(data):
+    return sorted(data.keys(), key=lambda value: int(value) if str(value).isdigit() else str(value))
+
+
+def build_attendance_summary(data, selected_centre=None):
+    centres = sorted_centres(data)
+    active_centre = selected_centre if selected_centre in data else (centres[0] if centres else None)
+    centre_data = data.get(active_centre, {}) if active_centre else {}
+    all_rolls = set()
+
+    subjects = []
+    for subject, roll_numbers in sorted(centre_data.items()):
+        subjects.append(
+            {
+                "subject": subject,
+                "roll_numbers": sorted(roll_numbers),
+                "count": len(roll_numbers),
+                "centre_count": 1 if roll_numbers else 0,
+            }
+        )
+        all_rolls.update(roll_numbers)
+
+    return {
+        "centres": centres,
+        "centre_count": len(centres),
+        "selected_centre": active_centre,
+        "subjects": subjects,
+        "subject_count": len(subjects),
+        "total_unique_rolls": len(all_rolls),
+    }
+
+
+def build_filtered_attendance_summary(data, selected_centre=None, selected_subjects=None):
+    summary = build_attendance_summary(data, selected_centre=selected_centre)
+    selected_subjects = selected_subjects or []
+    selected_set = set(selected_subjects)
+
+    if selected_set:
+        filtered_subjects = [item for item in summary["subjects"] if item["subject"] in selected_set]
+    else:
+        filtered_subjects = summary["subjects"]
+
+    selected_rolls = sorted({roll for item in filtered_subjects for roll in item["roll_numbers"]})
+
+    return {
+        **summary,
+        "selected_subjects": [item["subject"] for item in filtered_subjects],
+        "filtered_subjects": filtered_subjects,
+        "selected_rolls": selected_rolls,
+        "selected_roll_count": len(selected_rolls),
+        "selected_subject_count": len(filtered_subjects),
+    }
 
