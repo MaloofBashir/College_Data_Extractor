@@ -107,7 +107,9 @@ def build_attendance_summary(data, selected_centre=None):
 def build_filtered_attendance_summary(data, selected_centre=None, selected_subjects=None):
     summary = build_attendance_summary(data, selected_centre=selected_centre)
     selected_subjects = selected_subjects or []
-    selected_set = set(selected_subjects)
+    available_subjects = {item["subject"] for item in summary["subjects"]}
+    valid_selected_subjects = [subject for subject in selected_subjects if subject in available_subjects]
+    selected_set = set(valid_selected_subjects)
 
     if selected_set:
         filtered_subjects = [item for item in summary["subjects"] if item["subject"] in selected_set]
@@ -118,10 +120,9 @@ def build_filtered_attendance_summary(data, selected_centre=None, selected_subje
 
     return {
         **summary,
-        "selected_subjects": [item["subject"] for item in filtered_subjects],
+        "selected_subjects": valid_selected_subjects,
         "filtered_subjects": filtered_subjects,
         "selected_rolls": selected_rolls,
         "selected_roll_count": len(selected_rolls),
-        "selected_subject_count": len(filtered_subjects),
+        "selected_subject_count": len(valid_selected_subjects),
     }
-

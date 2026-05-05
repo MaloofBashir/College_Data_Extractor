@@ -267,6 +267,33 @@
             gap: 16px;
         }
 
+        .subject-summary-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .subject-summary-card {
+            border: 1px solid #dbe8f1;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #fcfeff 0%, #f0fbfd 100%);
+            padding: 16px;
+        }
+
+        .subject-summary-card h4 {
+            margin: 0 0 8px;
+            color: #15516a;
+            font-size: 15px;
+        }
+
+        .subject-summary-card p {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+            color: #12607c;
+        }
+
         .subject-roll-card {
             border: 1px solid #dbe8f1;
             border-radius: 18px;
@@ -380,6 +407,13 @@
                         <span class="chip">{{ subject }}</span>
                         {% endfor %}
                     </div>
+                    <p id="selection-state" class="hint">
+                        {% if attendance_summary.selected_subjects %}
+                        Showing only selected subjects.
+                        {% else %}
+                        No subject selected, so all subjects of this centre are visible.
+                        {% endif %}
+                    </p>
                     <h3 style="margin-top: 18px;">Memo Roll Numbers</h3>
                     <p class="hint">These are the combined rolls from the selected subjects in the chosen centre, shown for easy reading and memo entry.</p>
                     <div id="selected-rolls" class="roll-list">
@@ -395,6 +429,14 @@
             <div class="section-title">
                 <h2>Subject-wise Roll Numbers</h2>
                 <span class="badge">Keep this visible</span>
+            </div>
+            <div id="subject-summary-strip" class="subject-summary-strip">
+                {% for item in attendance_summary.filtered_subjects %}
+                <div class="subject-summary-card">
+                    <h4>{{ item.subject }}</h4>
+                    <p>{{ item.count }}</p>
+                </div>
+                {% endfor %}
             </div>
             <div id="subject-summary-body" class="subject-wise-rolls">
                 {% for item in attendance_summary.filtered_subjects %}
@@ -425,6 +467,8 @@
         const subjectSummaryBody = document.getElementById("subject-summary-body");
         const selectedRolls = document.getElementById("selected-rolls");
         const selectedSubjectChips = document.getElementById("selected-subject-chips");
+        const selectionState = document.getElementById("selection-state");
+        const subjectSummaryStrip = document.getElementById("subject-summary-strip");
         const downloadPdfBtn = document.getElementById("download-pdf-btn");
         const downloadExcelBtn = document.getElementById("download-excel-btn");
 
@@ -453,12 +497,21 @@
 
         function renderChips(subjects) {
             selectedSubjectChips.innerHTML = "";
+            if (!subjects.length) {
+                const chip = document.createElement("span");
+                chip.className = "chip";
+                chip.textContent = "All subjects";
+                selectedSubjectChips.appendChild(chip);
+                selectionState.textContent = "No subject selected, so all subjects of this centre are visible.";
+                return;
+            }
             subjects.forEach(subject => {
                 const chip = document.createElement("span");
                 chip.className = "chip";
                 chip.textContent = subject;
                 selectedSubjectChips.appendChild(chip);
             });
+            selectionState.textContent = "Showing only selected subjects.";
         }
 
         function renderRolls(rolls) {
@@ -499,6 +552,19 @@
             });
         }
 
+        function renderSubjectSummary(subjects) {
+            subjectSummaryStrip.innerHTML = "";
+            subjects.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "subject-summary-card";
+                card.innerHTML = `
+                    <h4>${item.subject}</h4>
+                    <p>${item.count}</p>
+                `;
+                subjectSummaryStrip.appendChild(card);
+            });
+        }
+
         function applyFilters() {
             updateDownloadLinks();
             fetch(`/Table_rollno/${buildFilterQuery()}`, {
@@ -513,6 +579,7 @@
                 }
                 renderChips(data.selected_subjects);
                 renderRolls(data.selected_rolls);
+                renderSubjectSummary(data.subjects);
                 renderTable(data.subjects);
                 renderSubjectPicker(data.available_subjects);
                 data.selected_subjects.forEach(subject => {
