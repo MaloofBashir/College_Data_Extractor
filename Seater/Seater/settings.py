@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__name__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -126,11 +126,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'Seater/Seating_Plan/static/Seating_Plan/css'),  # Changed to look in project root 'static' directory
+    os.path.join(BASE_DIR, 'Seating_Plan/static/Seating_Plan/css'),
 ]
 
 # Point to where collectstatic will collect files for production
-STATIC_ROOT = os.path.join(BASE_DIR, 'Seater/staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # STORAGES = {
 #     "default": {
 #         "BACKEND": "django.core.files.storage.FileSystemStorage",
