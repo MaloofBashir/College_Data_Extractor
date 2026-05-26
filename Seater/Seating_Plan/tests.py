@@ -1,6 +1,9 @@
+from io import BytesIO
 from unittest.mock import patch
 
-from django.test import SimpleTestCase
+from openpyxl import load_workbook
+from django.test import Client, SimpleTestCase, TestCase
+from django.urls import reverse
 
 from .result_parser import parse_overall_result, parse_subject_grades, split_student_blocks, summarize_result_pdf
 from .seating import build_filtered_attendance_summary
@@ -74,7 +77,7 @@ class ResultParserTests(SimpleTestCase):
         self.assertEqual(summary["students"][1]["issue_subjects"], ["EDU522J3"])
 
 
-class AttendanceSummaryTests(SimpleTestCase):
+class AttendanceSummaryTests(TestCase):
     def test_build_filtered_attendance_summary_filters_multiple_subjects(self):
         attendance_data = {
             "101": {
@@ -115,5 +118,38 @@ class AttendanceSummaryTests(SimpleTestCase):
         self.assertEqual(summary["selected_centre"], "102")
         self.assertEqual(summary["selected_rolls"], ["2001"])
         self.assertEqual([item["subject"] for item in summary["subjects"]], ["CHE101", "MAT101"])
+
+    def test_export_excel_streams_filtered_workbook_without_media_directory(self):
+        client = Client()
+        session = client.session
+        session["attendance_data"] = {
+            "101": {
+                "MAT101": ["1001", "1002"],
+                "PHY101": ["1002", "1003"],
+            },
+            "102": {
+                "MAT101": ["2001"],
+                "CHE101": ["2002"],
+            },
+        }
+        session.save()
+
+        response = client.get(reverse("export_excel"), {"centre": "102", "subjects": "CHE101,MAT101"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        self.assertIn('filename="roll_numbers_102.xlsx"', response["Content-Disposition"])
+
+        workbook = load_workbook(filename=BytesIO(response.content))
+        sheet = workbook.active
+
+        self.assertEqual(sheet.title, "102")
+        self.assertEqual(sheet.cell(row=1, column=1).value, "CHE101")
+        self.assertEqual(sheet.cell(row=2, column=1).value, "2002")
+        self.assertEqual(sheet.cell(row=1, column=2).value, "MAT101")
+        self.assertEqual(sheet.cell(row=2, column=2).value, "2001")
 
 # Create your tests here.

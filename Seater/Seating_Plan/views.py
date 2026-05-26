@@ -1,8 +1,7 @@
 from datetime import datetime
-import os
+from io import BytesIO
 
-from django.conf import settings
-from django.http import FileResponse, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 
 from .result_parser import summarize_result_pdf
@@ -168,30 +167,35 @@ def Table_rollno(request):
         return render(request, 'Table_rollno.html', context)
 
 def export_excel(request):
-    try:
-        attendance_data = request.session.get("attendance_data", {})
-        selected_centre = parse_centre_filter(request, attendance_data)
-        selected_subjects = parse_subject_filters(request)
-        summary = build_filtered_attendance_summary(attendance_data, selected_centre=selected_centre, selected_subjects=selected_subjects)
-        wb=Workbook()
-        ws=wb.active
-        ws.title=selected_centre or "Sheet1"
-        col=1
-        
-        filtered_export_data = {item["subject"]: item["roll_numbers"] for item in summary["filtered_subjects"]}
+    attendance_data = request.session.get("attendance_data")
+    if not attendance_data:
+        return redirect("Table_rollno")
 
-        for key,values in filtered_export_data.items():
-            ws.cell(row=1,column=col,value=key)
-            for row, value in enumerate(values,start=2):
-                ws.cell(row=row,column=col,value=value)
-            col+=1
-        file_name=f'roll_numbers_{selected_centre or "all"}.xlsx'
-        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
-        wb.save(file_path)
-        file_url = os.path.join(settings.MEDIA_URL, file_name)
-        response = FileResponse(open(file_path, 'rb'))
-        response['Content-Disposition'] = f'attachment; filename="{file_name}"'
-        return response
-    except Exception as e:
-     
-        return HttpResponse("Something went wrong", status=500)
+    selected_centre = parse_centre_filter(request, attendance_data)
+    selected_subjects = parse_subject_filters(request)
+    summary = build_filtered_attendance_summary(
+        attendance_data,
+        selected_centre=selected_centre,
+        selected_subjects=selected_subjects,
+    )
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = selected_centre or "Sheet1"
+
+    for col, item in enumerate(summary["filtered_subjects"], start=1):
+        ws.cell(row=1, column=col, value=item["subject"])
+        for row, value in enumerate(item["roll_numbers"], start=2):
+            ws.cell(row=row, column=col, value=value)
+
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    file_name = f'roll_numbers_{selected_centre or "all"}.xlsx'
+    response = HttpResponse(
+        output.getvalue(),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    response["Content-Disposition"] = f'attachment; filename="{file_name}"'
+    return response
