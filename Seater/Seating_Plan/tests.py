@@ -7,6 +7,7 @@ from django.urls import reverse
 
 from .result_parser import parse_overall_result, parse_subject_grades, split_student_blocks, summarize_result_pdf
 from .seating import build_filtered_attendance_summary
+from .views import attendance_summary_payload
 
 
 class ResultParserTests(SimpleTestCase):
@@ -72,6 +73,7 @@ class ResultParserTests(SimpleTestCase):
         self.assertEqual(summary["overall_passed"], 1)
         self.assertEqual(summary["overall_reappear"], 1)
         self.assertEqual(summary["overall_failed"], 1)
+        self.assertEqual(summary["overall_not_passed"], 2)
         self.assertEqual(summary["average_sgpa_pass_only"], 7.1)
         self.assertEqual(summary["subjects"][0]["subject_name"], "Education")
         self.assertEqual(summary["students"][1]["issue_subjects"], ["EDU522J3"])
@@ -151,5 +153,23 @@ class AttendanceSummaryTests(TestCase):
         self.assertEqual(sheet.cell(row=2, column=1).value, "2002")
         self.assertEqual(sheet.cell(row=1, column=2).value, "MAT101")
         self.assertEqual(sheet.cell(row=2, column=2).value, "2001")
+
+    def test_attendance_summary_payload_includes_selected_centre_student_count(self):
+        payload = attendance_summary_payload(
+            {
+                "101": {
+                    "MAT101": ["1001", "1002"],
+                    "PHY101": ["1002", "1003"],
+                },
+                "102": {
+                    "MAT101": ["2001"],
+                    "CHE101": ["2002"],
+                },
+            },
+            selected_centre="101",
+        )
+
+        self.assertEqual(payload["selected_centre"], "101")
+        self.assertEqual(payload["selected_centre_student_count"], 3)
 
 # Create your tests here.

@@ -314,6 +314,7 @@ def summarize_result_pdf(file_obj):
         "overall_passed": overall_passed,
         "overall_failed": overall_failed,
         "overall_reappear": overall_reappear,
+        "overall_not_passed": overall_failed + overall_reappear,
         "overall_pass_percentage": overall_pass_percentage,
         "average_sgpa_pass_only": average_sgpa,
         "parsed_pages": len(reader.pages),

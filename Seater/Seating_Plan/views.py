@@ -40,6 +40,7 @@ def attendance_summary_payload(data, selected_centre=None, selected_subjects=Non
     summary = build_filtered_attendance_summary(data, selected_centre=selected_centre, selected_subjects=selected_subjects)
     return {
         "selected_centre": summary["selected_centre"],
+        "selected_centre_student_count": summary["total_unique_rolls"],
         "centres": summary["centres"],
         "available_subjects": [item["subject"] for item in summary["subjects"]],
         "selected_subjects": summary["selected_subjects"],

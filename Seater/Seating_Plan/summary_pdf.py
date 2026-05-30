@@ -179,49 +179,6 @@ def append_page(pages, image):
     pages.append(image.convert("RGB"))
 
 
-def draw_histogram(draw, x, y, width, height, subjects):
-    draw.rounded_rectangle((x, y, x + width, y + height), radius=20, fill="#f7fbff", outline="#d5e0f1", width=2)
-    title = "Passed Students Histogram"
-    draw.text((x + 24, y + 18), title, font=SECTION_FONT, fill=ACCENT_COLOR)
-
-    chart_left = x + 70
-    chart_right = x + width - 24
-    chart_top = y + 82
-    chart_bottom = y + height - 90
-
-    max_passed = max((item["passed"] for item in subjects), default=1)
-    tick_values = [max_passed, round(max_passed * 0.75), round(max_passed * 0.5), round(max_passed * 0.25), 0]
-
-    for index, tick in enumerate(tick_values):
-        ratio = 0 if max_passed == 0 else tick / max_passed
-        tick_y = chart_bottom - int(ratio * (chart_bottom - chart_top))
-        draw.line((chart_left, tick_y, chart_right, tick_y), fill="#e4edf9", width=2)
-        draw.text((x + 22, tick_y - 10), str(tick), font=SMALL_FONT, fill="#61748e")
-
-    draw.line((chart_left, chart_top, chart_left, chart_bottom), fill="#93a7c3", width=2)
-    draw.line((chart_left, chart_bottom, chart_right, chart_bottom), fill="#93a7c3", width=2)
-
-    bars = subjects[:8]
-    if not bars:
-        draw.text((x + 24, y + 80), "No subject data available.", font=BODY_FONT, fill=TEXT_COLOR)
-        return
-
-    chart_width = chart_right - chart_left
-    slot_width = chart_width // max(len(bars), 1)
-    bar_width = max(28, min(64, slot_width - 18))
-
-    for index, item in enumerate(bars):
-        bar_x = chart_left + index * slot_width + (slot_width - bar_width) // 2
-        bar_height = 0 if max_passed == 0 else int((item["passed"] / max_passed) * (chart_bottom - chart_top))
-        bar_y = chart_bottom - bar_height
-        bar_fill = "#1f67c6" if index % 2 == 0 else "#4ea3ff"
-        draw.rounded_rectangle((bar_x, bar_y, bar_x + bar_width, chart_bottom), radius=12, fill=bar_fill)
-        label = item["subject"][:8]
-        draw.text((bar_x - 6, chart_bottom + 12), label, font=SMALL_FONT, fill=TEXT_COLOR)
-        draw.text((bar_x + 8, bar_y - 26), str(item["passed"]), font=SMALL_FONT, fill=ACCENT_COLOR)
-        draw.text((bar_x - 6, chart_bottom + 34), f'{item["pass_percentage"]}%', font=SMALL_FONT, fill="#61748e")
-
-
 def generate_summary_pdf(summary):
     pages = []
     image, draw = make_page()
@@ -246,50 +203,11 @@ def generate_summary_pdf(summary):
     cards = [
         {"label": "Total Students", "value": str(summary["total_students"])},
         {"label": "Passed", "value": str(summary["overall_passed"])},
-        {"label": "Reappear", "value": str(summary["overall_reappear"])},
-        {"label": "Failed", "value": str(summary["overall_failed"])},
+        {"label": "Failed", "value": str(summary["overall_not_passed"])},
         {"label": "Overall Pass %", "value": f'{summary["overall_pass_percentage"]}%'},
-        {
-            "label": "Average SGPA (Pass Only)",
-            "value": str(summary["average_sgpa_pass_only"] or "N/A"),
-        },
     ]
     y = draw_metric_cards(draw, y, cards)
 
-    y = draw_section_title(draw, "Overall Result Status", y)
-    status_rows = [
-        [item["status"], str(item["count"]), f'{item["percentage"]}%']
-        for item in summary["status_summary"]
-    ]
-    y = draw_table(draw, y, ["Status", "Count", "Percentage"], status_rows, [330, 220, 220])
-    top_subjects = summary.get("top_subjects") or sorted(
-        summary["subjects"],
-        key=lambda item: (-item["pass_percentage"], -item["passed"], item["subject"]),
-    )[:8]
-    draw_histogram(draw, MARGIN, y, PAGE_SIZE[0] - (2 * MARGIN), 470, top_subjects)
-    y += 500
-
-    y = draw_section_title(draw, "Top Subjects", y)
-    top_rows = [
-        [
-            item["subject"],
-            item["subject_name"],
-            str(item["appeared"]),
-            f'{item["pass_percentage"]}%',
-        ]
-        for item in top_subjects
-    ]
-    draw_table(
-        draw,
-        y,
-        ["Subject", "Name", "Appeared", "Pass %"],
-        top_rows,
-        [170, 470, 160, 160],
-    )
-    append_page(pages, image)
-
-    image, draw = make_page()
-    y = MARGIN
     y = draw_section_title(draw, "Subject-wise Performance", y)
     subject_rows = [
         [
@@ -297,8 +215,6 @@ def generate_summary_pdf(summary):
             item["subject_name"],
             str(item["appeared"]),
             str(item["passed"]),
-            str(item["failed"]),
-            str(item["absent"]),
             f'{item["pass_percentage"]}%',
         ]
         for item in summary["subjects"]
@@ -306,57 +222,11 @@ def generate_summary_pdf(summary):
     y = draw_table(
         draw,
         y,
-        ["Code", "Subject", "Appeared", "Passed", "Failed", "Absent", "Pass %"],
+        ["Code", "Subject", "Total Students", "Passed", "Pass %"],
         subject_rows,
-        [140, 340, 120, 120, 120, 120, 120],
+        [140, 420, 180, 140, 140],
     )
     append_page(pages, image)
-
-    student_headers = ["Roll No", "Name", "Status", "SGPA", "Reappear / Failed Subjects"]
-    student_widths = [160, 320, 150, 120, 360]
-    image, draw = make_page()
-    y = MARGIN
-    y = draw_section_title(draw, "Detailed Student Summary", y)
-    y = draw_table_header(draw, y, student_headers, student_widths) + 4
-
-    for student in summary["students"]:
-        issues = ", ".join(student["issue_subjects"]) if student["issue_subjects"] else "-"
-        row = [
-            student["roll_no"] or "-",
-            student["name"] or "-",
-            student["overall_status"],
-            "-" if student["sgpa"] is None else str(student["sgpa"]),
-            issues,
-        ]
-        next_height = 40
-        if y + next_height > PAGE_SIZE[1] - MARGIN:
-            append_page(pages, image)
-            image, draw = make_page()
-            y = MARGIN
-            y = draw_section_title(draw, "Detailed Student Summary", y)
-            y = draw_table_header(draw, y, student_headers, student_widths) + 4
-        y = draw_table_row(draw, y, row, student_widths) + 2
-
-    append_page(pages, image)
-
-    if summary["pass_students"]:
-        image, draw = make_page()
-        y = MARGIN
-        y = draw_section_title(draw, "Pass Students SGPA", y)
-        pass_headers = ["Roll No", "Name", "SGPA"]
-        pass_widths = [190, 650, 180]
-        y = draw_table_header(draw, y, pass_headers, pass_widths) + 4
-
-        for student in summary["pass_students"]:
-            if y + 40 > PAGE_SIZE[1] - MARGIN:
-                append_page(pages, image)
-                image, draw = make_page()
-                y = MARGIN
-                y = draw_section_title(draw, "Pass Students SGPA", y)
-                y = draw_table_header(draw, y, pass_headers, pass_widths) + 4
-            y = draw_table_row(draw, y, [student["roll_no"], student["name"], str(student["sgpa"])], pass_widths) + 2
-
-        append_page(pages, image)
 
     pdf_buffer = BytesIO()
     pages[0].save(pdf_buffer, format="PDF", save_all=True, append_images=pages[1:])

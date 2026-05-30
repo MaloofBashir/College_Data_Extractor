@@ -156,6 +156,41 @@
             font-weight: 700;
         }
 
+        .selector-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: stretch;
+        }
+
+        .selector-block {
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .selector-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #15516a;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .student-total-display {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 49px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid #cfe1e8;
+            background: #fff;
+            color: #15495f;
+            font-size: 16px;
+            font-weight: 700;
+            box-sizing: border-box;
+        }
+
         .subject-chip-grid {
             display: flex;
             flex-wrap: wrap;
@@ -327,6 +362,19 @@
             border-radius: 22px;
         }
 
+        .selector-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .selector-head h3 {
+            margin: 0;
+        }
+
         @media (max-width: 960px) {
             .filter-layout {
                 grid-template-columns: 1fr;
@@ -373,12 +421,23 @@
             </div>
             <div class="filter-layout">
                 <div class="filter-box">
-                    <h3>Select centre first</h3>
-                    <select id="centre-picker" class="centre-select">
-                        {% for centre_no in centre_nos %}
-                        <option value="{{ centre_no }}" {% if attendance_summary.selected_centre == centre_no %}selected{% endif %}>Centre {{ centre_no }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="selector-head">
+                        <h3>Select centre first</h3>
+                    </div>
+                    <div class="selector-controls">
+                        <div class="selector-block">
+                            <label class="selector-label" for="centre-picker">Centre No</label>
+                            <select id="centre-picker" class="centre-select">
+                                {% for centre_no in centre_nos %}
+                                <option value="{{ centre_no }}" {% if attendance_summary.selected_centre == centre_no %}selected{% endif %}>Centre {{ centre_no }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="selector-block">
+                            <span class="selector-label">Total Students</span>
+                            <div class="student-total-display" id="selected-centre-total-pill">{{ attendance_summary.total_unique_rolls }}</div>
+                        </div>
+                    </div>
                     <p class="hint">All roll numbers below will belong only to the selected centre.</p>
                 </div>
 
@@ -471,6 +530,7 @@
         const subjectSummaryStrip = document.getElementById("subject-summary-strip");
         const downloadPdfBtn = document.getElementById("download-pdf-btn");
         const downloadExcelBtn = document.getElementById("download-excel-btn");
+        const selectedCentreTotalPill = document.getElementById("selected-centre-total-pill");
 
         function getSelectedSubjects() {
             return Array.from(subjectPicker.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
@@ -493,6 +553,10 @@
             const query = buildFilterQuery();
             downloadPdfBtn.href = "{% url 'download_attendance_pdf' %}" + query;
             downloadExcelBtn.href = "{% url 'export_excel' %}" + query;
+        }
+
+        function renderSelectedCentreTotal(selectedCentre, studentCount) {
+            selectedCentreTotalPill.textContent = studentCount;
         }
 
         function renderChips(subjects) {
@@ -582,6 +646,7 @@
                 renderSubjectSummary(data.subjects);
                 renderTable(data.subjects);
                 renderSubjectPicker(data.available_subjects);
+                renderSelectedCentreTotal(data.selected_centre, data.selected_centre_student_count);
                 data.selected_subjects.forEach(subject => {
                     const input = subjectPicker.querySelector(`input[value="${CSS.escape(subject)}"]`);
                     if (input) {

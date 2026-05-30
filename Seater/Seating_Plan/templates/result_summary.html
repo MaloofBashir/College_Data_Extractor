@@ -438,16 +438,15 @@
         <div class="hero-card">
             <h1>Result Pass Percentage Summary</h1>
             <p>
-                This report now shows the summary directly on screen and also lets you download the full summary as a PDF in a report layout similar to your sample.
+                This report shows only the overall pass percentage and subject-wise passed counts.
             </p>
             <div class="hero-actions">
-                <a href="{% url 'download_result_summary_pdf' %}" class="action-button secondary">Download Full Summary PDF</a>
+                <a href="{% url 'download_result_summary_pdf' %}" class="action-button secondary">Download Summary PDF</a>
                 <a href="{% url 'index' %}" class="action-button">Upload Another PDF</a>
             </div>
             <div class="meta-strip">
                 <div class="meta-pill">Generated: {{ summary_generated_at|default:current_date_time }}</div>
-                <div class="meta-pill">Parsed pages: {{ summary.parsed_pages }}</div>
-                <div class="meta-pill">Student rows detected: {{ summary.parsed_students }}</div>
+                <div class="meta-pill">Total Students: {{ summary.total_students }}</div>
             </div>
         </div>
 
@@ -461,145 +460,19 @@
                 <p class="summary-stat">{{ summary.overall_passed }}</p>
             </div>
             <div class="summary-card">
-                <h3>Reappear</h3>
-                <p class="summary-stat">{{ summary.overall_reappear }}</p>
-            </div>
-            <div class="summary-card">
                 <h3>Failed</h3>
-                <p class="summary-stat">{{ summary.overall_failed }}</p>
+                <p class="summary-stat">{{ summary.overall_not_passed }}</p>
             </div>
             <div class="summary-card">
                 <h3>Overall Pass %</h3>
                 <p class="summary-stat">{{ summary.overall_pass_percentage }}%</p>
             </div>
-            <div class="summary-card">
-                <h3>Average SGPA</h3>
-                <p class="summary-stat">
-                    {% if summary.average_sgpa_pass_only %}
-                    {{ summary.average_sgpa_pass_only }}
-                    {% else %}
-                    N/A
-                    {% endif %}
-                </p>
-            </div>
         </div>
 
         <div class="section-card">
             <div class="section-title">
-                <h2>Overall Result Status</h2>
-                <span class="badge">Summary Overview</span>
-            </div>
-            <div class="status-grid">
-                {% for item in summary.status_summary %}
-                <div class="status-box">
-                    <strong>{{ item.status }}</strong>
-                    <span>{{ item.count }}</span>
-                    <p class="muted">{{ item.percentage }}% of total students</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="section-card">
-            <div class="section-title">
-                <h2>Highlights</h2>
-                <span class="badge">Like the sample overview page</span>
-            </div>
-            <div class="insight-grid">
-                <div class="highlight-panel">
-                    <h3>Top Subject</h3>
-                    {% if summary.top_subject %}
-                    <p class="big-text">{{ summary.top_subject.subject }}</p>
-                    <p><strong>{{ summary.top_subject.subject_name }}</strong></p>
-                    <p class="muted">
-                        Appeared: {{ summary.top_subject.appeared }} |
-                        Passed: {{ summary.top_subject.passed }} |
-                        Pass %: {{ summary.top_subject.pass_percentage }}%
-                    </p>
-                    {% else %}
-                    <p class="muted">No subject highlight available.</p>
-                    {% endif %}
-                </div>
-
-                <div class="highlight-panel">
-                    <h3>Best Performing Subjects</h3>
-                    <table class="mini-table">
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th>Pass %</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in summary.subjects|dictsortreversed:"pass_percentage"|slice:":5" %}
-                            <tr>
-                                <td>{{ item.subject }}</td>
-                                <td>{{ item.pass_percentage }}%</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="section-card">
-            <div class="section-title">
-                <h2>Visual Overview</h2>
-                <span class="badge">Histogram Added</span>
-            </div>
-            <div class="chart-grid">
-                <div class="chart-card">
-                    <h3>Passed Students Histogram</h3>
-                    <p>Bar height shows number of passed students. Pass percentage is shown separately below each subject.</p>
-                    <div class="histogram">
-                        <div class="histogram-y-axis">
-                            {% with max_pass=summary.top_subject_max_passed|default:1 %}
-                            <span>{{ max_pass }}</span>
-                            <span>{% widthratio max_pass 4 3 %}</span>
-                            <span>{% widthratio max_pass 2 1 %}</span>
-                            <span>{% widthratio max_pass 4 1 %}</span>
-                            <span>0</span>
-                            {% endwith %}
-                        </div>
-                        <div class="histogram-bars">
-                            {% for item in summary.top_subjects %}
-                            <div class="histogram-bar-group">
-                                <div class="histogram-value">{{ item.passed }}</div>
-                                <div class="histogram-bar" style="height: {% widthratio item.passed summary.top_subject_max_passed|default:1 240 %}px;"></div>
-                                <div class="histogram-label">{{ item.subject }}</div>
-                                <div class="histogram-subvalue">{{ item.pass_percentage }}%</div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="chart-card">
-                    <h3>Result Status Snapshot</h3>
-                    <p>A cleaner visual distribution of overall student status.</p>
-                    <div class="status-visual">
-                        {% for item in summary.status_summary %}
-                        <div class="status-track">
-                            <div class="status-head">
-                                <span>{{ item.status }}</span>
-                                <span>{{ item.count }} students</span>
-                            </div>
-                            <div class="status-bar-shell">
-                                <div class="status-bar-fill" style="width: {{ item.percentage }}%;"></div>
-                            </div>
-                            <div class="muted" style="margin-top: 8px;">{{ item.percentage }}% of total</div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section-card">
-            <div class="section-title">
-                <h2>Subject-wise Performance</h2>
-                <span class="badge">Detailed Breakdown</span>
+                <h2>Subject Pass Percentage</h2>
+                <span class="badge">Simple Summary</span>
             </div>
             <div class="wide-table-wrap">
                 <table class="wide-table">
@@ -607,12 +480,9 @@
                         <tr>
                             <th>Subject Code</th>
                             <th>Subject Name</th>
-                            <th>Appeared</th>
+                            <th>Total Students</th>
                             <th>Passed</th>
-                            <th>Failed</th>
-                            <th>Absent</th>
                             <th>Pass %</th>
-                            <th>Failed / Reappear Students</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -622,71 +492,7 @@
                             <td>{{ item.subject_name }}</td>
                             <td>{{ item.appeared }}</td>
                             <td>{{ item.passed }}</td>
-                            <td>{{ item.failed }}</td>
-                            <td>{{ item.absent }}</td>
-                            <td class="total-count">{{ item.pass_percentage }}%</td>
-                            <td>
-                                {% if item.failed_students %}
-                                    {% for student in item.failed_students %}
-                                        <div>{{ student.roll_no }} - {{ student.name }}</div>
-                                    {% endfor %}
-                                {% else %}
-                                    <span class="muted">None</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="section-card">
-            <div class="section-title">
-                <h2>Detailed Student Summary</h2>
-                <span class="badge">Full Report Data</span>
-            </div>
-            <div class="wide-table-wrap">
-                <table class="wide-table">
-                    <thead>
-                        <tr>
-                            <th>Roll No</th>
-                            <th>Reg No</th>
-                            <th>Name</th>
-                            <th>Status</th>
-                            <th>SGPA</th>
-                            <th>Reappear / Failed Subjects</th>
-                            <th>Subjects & Grades</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for student in summary.students %}
-                        <tr>
-                            <td>{{ student.roll_no|default:"-" }}</td>
-                            <td>{{ student.reg_no|default:"-" }}</td>
-                            <td>{{ student.name|default:"-" }}</td>
-                            <td><span class="badge">{{ student.overall_status }}</span></td>
-                            <td>
-                                {% if student.sgpa %}
-                                {{ student.sgpa }}
-                                {% else %}
-                                -
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if student.issue_subjects %}
-                                    {{ student.issue_subjects|join:", " }}
-                                {% else %}
-                                    <span class="muted">None</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="student-details">
-                                    {% for subject in student.subject_grades %}
-                                    <span>{{ subject.subject_code }} ({{ subject.grade }})</span>
-                                    {% endfor %}
-                                </div>
-                            </td>
+                            <td>{{ item.pass_percentage }}%</td>
                         </tr>
                         {% endfor %}
                     </tbody>
