@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="{% static 'Seating_Plan/Table_Rollno.css' %}">
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -222,7 +223,7 @@
             transition: all 0.2s ease;
         }
 
-        .subject-chip input:checked + label {
+        .subject-chip input:checked+label {
             background: linear-gradient(135deg, #12607c 0%, #2487a8 100%);
             color: #fff;
             border-color: #12607c;
@@ -386,6 +387,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="page-shell">
         {% if error %}
@@ -401,16 +403,15 @@
         <div class="hero-card">
             <h1>Attendance Roll Number Summary</h1>
             <p>
-                This section now gives you a proper summary page, lets you filter by one or more subjects, shows the combined filtered roll numbers, and lets you download the filtered view as PDF or Excel.
+                This section now gives you a proper summary page, lets you filter by one or more subjects, shows the
+                combined filtered roll numbers, and lets you download the filtered view as PDF or Excel.
             </p>
             <div class="hero-actions">
                 <a href="{% url 'index' %}" class="action-button secondary">Upload Another PDF</a>
             </div>
             <div class="meta-strip">
-                <div class="meta-pill">Generated: {{ attendance_generated_at|default:current_date_time }}</div>
                 <div class="meta-pill">Centres: {{ attendance_summary.centre_count }}</div>
                 <div class="meta-pill">Subjects: {{ attendance_summary.subject_count }}</div>
-                <div class="meta-pill">Unique rolls: {{ attendance_summary.total_unique_rolls }}</div>
             </div>
         </div>
 
@@ -438,7 +439,6 @@
                             <div class="student-total-display" id="selected-centre-total-pill">{{ attendance_summary.total_unique_rolls }}</div>
                         </div>
                     </div>
-                    <p class="hint">All roll numbers below will belong only to the selected centre.</p>
                 </div>
 
                 <div class="filter-box">
@@ -451,34 +451,13 @@
                         </div>
                         {% endfor %}
                     </div>
-                    <p class="hint">Just click subjects one by one. The roll numbers update automatically.</p>
                     <div class="filter-actions" style="margin-top: 16px;">
-                        <button type="button" class="action-button dark" id="clear-filter-btn">Show All Subjects</button>
-                        <a id="download-pdf-btn" href="{% url 'download_attendance_pdf' %}" class="action-button dark">Download Filtered PDF</a>
-                        <a id="download-excel-btn" href="{% url 'export_excel' %}" class="action-button dark">Download Filtered Excel</a>
-                    </div>
-                </div>
-
-                <div class="filter-box roll-panel">
-                    <h3>Selected Subjects</h3>
-                    <div id="selected-subject-chips" class="chip-cloud">
-                        {% for subject in attendance_summary.selected_subjects %}
-                        <span class="chip">{{ subject }}</span>
-                        {% endfor %}
-                    </div>
-                    <p id="selection-state" class="hint">
-                        {% if attendance_summary.selected_subjects %}
-                        Showing only selected subjects.
-                        {% else %}
-                        No subject selected, so all subjects of this centre are visible.
-                        {% endif %}
-                    </p>
-                    <h3 style="margin-top: 18px;">Memo Roll Numbers</h3>
-                    <p class="hint">These are the combined rolls from the selected subjects in the chosen centre, shown for easy reading and memo entry.</p>
-                    <div id="selected-rolls" class="roll-list">
-                        {% for roll in attendance_summary.selected_rolls %}
-                        <span class="roll-pill">{{ roll }}</span>
-                        {% endfor %}
+                        <button type="button" class="action-button dark" id="clear-filter-btn">Show All
+                            Subjects</button>
+                        <a id="download-pdf-btn" href="{% url 'download_attendance_pdf' %}"
+                            class="action-button dark">Download Filtered PDF</a>
+                        <a id="download-excel-btn" href="{% url 'export_excel' %}" class="action-button dark">Download
+                            Filtered Excel</a>
                     </div>
                 </div>
             </div>
@@ -501,10 +480,30 @@
                 {% for item in attendance_summary.filtered_subjects %}
                 <div class="subject-roll-card">
                     <h3>{{ item.subject }}</h3>
-                    <div class="subject-roll-meta">{{ item.count }} rolls | {{ item.centre_count }} centres</div>
+                    <div class="subject-roll-meta">{{ item.count }} rolls</div>
                     <div class="subject-roll-values">{{ item.roll_numbers|join:", " }}</div>
                 </div>
                 {% endfor %}
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-title">
+                <h2>Selected Subjects</h2>
+                <span class="badge">Memo Rolls</span>
+            </div>
+            <div class="filter-box roll-panel">
+                <div id="selected-subject-chips" class="chip-cloud">
+                    {% for subject in attendance_summary.selected_subjects %}
+                    <span class="chip">{{ subject }}</span>
+                    {% endfor %}
+                </div>
+                <h3 style="margin-top: 18px;">Memo Roll Numbers</h3>
+                <div id="selected-rolls" class="roll-list">
+                    {% for roll in attendance_summary.selected_rolls %}
+                    <span class="roll-pill">{{ roll }}</span>
+                    {% endfor %}
+                </div>
             </div>
         </div>
         {% else %}
@@ -526,7 +525,6 @@
         const subjectSummaryBody = document.getElementById("subject-summary-body");
         const selectedRolls = document.getElementById("selected-rolls");
         const selectedSubjectChips = document.getElementById("selected-subject-chips");
-        const selectionState = document.getElementById("selection-state");
         const subjectSummaryStrip = document.getElementById("subject-summary-strip");
         const downloadPdfBtn = document.getElementById("download-pdf-btn");
         const downloadExcelBtn = document.getElementById("download-excel-btn");
@@ -566,7 +564,6 @@
                 chip.className = "chip";
                 chip.textContent = "All subjects";
                 selectedSubjectChips.appendChild(chip);
-                selectionState.textContent = "No subject selected, so all subjects of this centre are visible.";
                 return;
             }
             subjects.forEach(subject => {
@@ -575,7 +572,6 @@
                 chip.textContent = subject;
                 selectedSubjectChips.appendChild(chip);
             });
-            selectionState.textContent = "Showing only selected subjects.";
         }
 
         function renderRolls(rolls) {
@@ -609,7 +605,7 @@
                 card.className = "subject-roll-card";
                 card.innerHTML = `
                     <h3>${item.subject}</h3>
-                    <div class="subject-roll-meta">${item.count} rolls | ${item.centre_count} centres</div>
+                    <div class="subject-roll-meta">${item.count} rolls</div>
                     <div class="subject-roll-values">${item.roll_numbers.join(", ")}</div>
                 `;
                 subjectSummaryBody.appendChild(card);
@@ -636,29 +632,29 @@
                     "X-Requested-With": "XMLHttpRequest"
                 }
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    return;
-                }
-                renderChips(data.selected_subjects);
-                renderRolls(data.selected_rolls);
-                renderSubjectSummary(data.subjects);
-                renderTable(data.subjects);
-                renderSubjectPicker(data.available_subjects);
-                renderSelectedCentreTotal(data.selected_centre, data.selected_centre_student_count);
-                data.selected_subjects.forEach(subject => {
-                    const input = subjectPicker.querySelector(`input[value="${CSS.escape(subject)}"]`);
-                    if (input) {
-                        input.checked = true;
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        return;
                     }
-                });
-                updateDownloadLinks();
-            })
-            .catch(error => console.error("Filter request failed", error));
+                    renderChips(data.selected_subjects);
+                    renderRolls(data.selected_rolls);
+                    renderSubjectSummary(data.subjects);
+                    renderTable(data.subjects);
+                    renderSubjectPicker(data.available_subjects);
+                    renderSelectedCentreTotal(data.selected_centre, data.selected_centre_student_count);
+                    data.selected_subjects.forEach(subject => {
+                        const input = subjectPicker.querySelector(`input[value="${CSS.escape(subject)}"]`);
+                        if (input) {
+                            input.checked = true;
+                        }
+                    });
+                    updateDownloadLinks();
+                })
+                .catch(error => console.error("Filter request failed", error));
         }
 
-        clearFilterBtn.addEventListener("click", function() {
+        clearFilterBtn.addEventListener("click", function () {
             Array.from(subjectPicker.querySelectorAll('input[type="checkbox"]')).forEach(input => {
                 input.checked = false;
             });
@@ -666,7 +662,7 @@
         });
 
         subjectPicker.addEventListener("change", applyFilters);
-        centrePicker.addEventListener("change", function() {
+        centrePicker.addEventListener("change", function () {
             Array.from(subjectPicker.querySelectorAll('input[type="checkbox"]')).forEach(input => {
                 input.checked = false;
             });
@@ -676,4 +672,5 @@
     </script>
     {% endif %}
 </body>
+
 </html>
