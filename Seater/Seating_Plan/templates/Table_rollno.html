@@ -636,6 +636,7 @@
         .room-head h3 {
             margin: 0;
             color: #15495f;
+            overflow-wrap: anywhere;
         }
 
         .room-subhead {
@@ -1246,7 +1247,12 @@
             if (!room) {
                 return;
             }
-            room[field] = field === "name" ? value : (field === "fillOrder" ? value : Math.max(Number(value) || 1, 1));
+            if (field === "name") {
+                room.name = value;
+                return;
+            }
+
+            room[field] = field === "fillOrder" ? value : Math.max(Number(value) || 1, 1);
             renderPlanner();
         }
 
@@ -1425,7 +1431,7 @@
                 roomCard.innerHTML = `
                     <div class="room-head">
                         <div>
-                            <h3>${escapeHtml(getRoomName(room, roomIndex))}</h3>
+                            <h3 data-room-heading="${room.id}">${escapeHtml(getRoomName(room, roomIndex))}</h3>
                             <div class="room-subhead">${isAutoRoom ? "Auto-created because the previous room overflowed." : "Drop subjects into this room to fill its single table."}</div>
                         </div>
                         <div class="room-summary">
@@ -1472,9 +1478,15 @@
                 const orderSelect = roomCard.querySelector(`#${CSS.escape(room.id)}-order`);
                 const dropzone = roomCard.querySelector(`[data-room-drop="${room.id}"]`);
 
-                nameInput.addEventListener("input", event => updateRoomField(room.id, "name", event.target.value));
-                rowsInput.addEventListener("input", event => updateRoomField(room.id, "rows", event.target.value));
-                columnsInput.addEventListener("input", event => updateRoomField(room.id, "columns", event.target.value));
+                nameInput.addEventListener("input", event => {
+                    updateRoomField(room.id, "name", event.target.value);
+                    const heading = roomCard.querySelector(`[data-room-heading="${room.id}"]`);
+                    if (heading) {
+                        heading.textContent = getRoomName(room, roomIndex);
+                    }
+                });
+                rowsInput.addEventListener("change", event => updateRoomField(room.id, "rows", event.target.value));
+                columnsInput.addEventListener("change", event => updateRoomField(room.id, "columns", event.target.value));
                 orderSelect.addEventListener("change", event => updateRoomField(room.id, "fillOrder", event.target.value));
 
                 dropzone.addEventListener("dragover", event => {
