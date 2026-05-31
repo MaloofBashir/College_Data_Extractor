@@ -376,6 +376,481 @@
             margin: 0;
         }
 
+        .planner-launch-wrap {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 18px;
+        }
+
+        .planner-launch-btn {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 0 rgba(35, 171, 212, 0.45);
+            animation: plannerPulse 1.8s infinite;
+            color: #111111;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff1a6 0%, #ffd86d 52%, #fff8cf 100%);
+            border: 1px solid rgba(138, 101, 19, 0.35);
+        }
+
+        .planner-launch-btn::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.72) 50%, transparent 80%);
+            transform: translateX(-130%);
+            animation: plannerSweep 2.6s linear infinite;
+        }
+
+        .planner-launch-btn:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 18px 30px rgba(120, 90, 12, 0.2);
+        }
+
+        .planner-launch-btn:active {
+            transform: scale(0.97);
+        }
+
+        .planner-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 28, 41, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 999;
+        }
+
+        .planner-modal.is-open {
+            display: flex;
+        }
+
+        .planner-panel {
+            width: min(1280px, 100%);
+            max-height: 92vh;
+            overflow: auto;
+            background: linear-gradient(180deg, #fbfeff 0%, #f2fbfd 100%);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 28px 60px rgba(4, 26, 37, 0.26);
+            border: 1px solid rgba(18, 96, 124, 0.14);
+        }
+
+        .planner-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .planner-head h2,
+        .planner-head p {
+            margin: 0;
+        }
+
+        .planner-head p {
+            margin-top: 8px;
+            color: #5d7885;
+            max-width: 760px;
+        }
+
+        .planner-close {
+            border: none;
+            background: #e8f6fb;
+            color: #15516a;
+            border-radius: 999px;
+            width: 42px;
+            height: 42px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .planner-layout {
+            display: grid;
+            grid-template-columns: 320px minmax(0, 1fr);
+            gap: 20px;
+        }
+
+        .planner-sidebar,
+        .planner-main {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .planner-sidebar {
+            position: sticky;
+            top: 0;
+            align-self: start;
+        }
+
+        .planner-box {
+            background: #fff;
+            border: 1px solid #dbe8f1;
+            border-radius: 22px;
+            padding: 18px;
+        }
+
+        .planner-box h3,
+        .planner-box h4 {
+            margin: 0 0 12px;
+            color: #15516a;
+        }
+
+        .planner-box h4 {
+            font-size: 15px;
+        }
+
+        .planner-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .planner-stat {
+            background: linear-gradient(180deg, #fbfeff 0%, #edf9fc 100%);
+            border: 1px solid #d6eaf2;
+            border-radius: 16px;
+            padding: 14px;
+        }
+
+        .planner-stat span {
+            display: block;
+            font-size: 13px;
+            color: #5f7b87;
+            margin-bottom: 4px;
+        }
+
+        .planner-stat strong {
+            font-size: 22px;
+            color: #12607c;
+        }
+
+        .planner-subject-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 58vh;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .planner-subject-card {
+            border: 1px solid #d7e8ef;
+            border-radius: 18px;
+            padding: 14px;
+            background: linear-gradient(180deg, #ffffff 0%, #f3fbfd 100%);
+            cursor: grab;
+        }
+
+        .planner-subject-card:active {
+            cursor: grabbing;
+        }
+
+        .planner-subject-card.is-complete {
+            opacity: 0.56;
+        }
+
+        .planner-subject-card strong,
+        .planner-subject-card span {
+            display: block;
+        }
+
+        .planner-subject-card strong {
+            color: #184c61;
+            margin-bottom: 6px;
+        }
+
+        .planner-subject-card span {
+            color: #5f7b87;
+            font-size: 14px;
+        }
+
+        .planner-main-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .planner-secondary-btn {
+            border: 1px solid #cbe1e8;
+            background: #fff;
+            color: #15516a;
+            padding: 11px 16px;
+            border-radius: 999px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .planner-button-feedback {
+            transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+        }
+
+        .planner-button-feedback:active {
+            transform: scale(0.96);
+            filter: brightness(0.95);
+        }
+
+        .planner-button-feedback.is-clicked {
+            animation: plannerButtonBounce 0.4s ease;
+            box-shadow: 0 0 0 4px rgba(36, 135, 168, 0.16);
+        }
+
+        .planner-help {
+            color: #5f7b87;
+            font-size: 14px;
+        }
+
+        .rooms-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .room-card {
+            background: #fff;
+            border: 1px solid #dbe8f1;
+            border-radius: 24px;
+            padding: 20px;
+        }
+
+        .room-card.is-drop-target {
+            border-color: #1d86a6;
+            box-shadow: 0 0 0 3px rgba(36, 135, 168, 0.12);
+        }
+
+        .room-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .room-head h3 {
+            margin: 0;
+            color: #15495f;
+        }
+
+        .room-subhead {
+            color: #5f7b87;
+            margin-top: 6px;
+            font-size: 14px;
+        }
+
+        .room-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .room-control label {
+            display: block;
+            margin-bottom: 8px;
+            color: #15516a;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .room-control input,
+        .room-control select {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 14px;
+            border: 1px solid #cfe1e8;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        .room-dropzone {
+            border: 2px dashed #bddae4;
+            border-radius: 20px;
+            background: linear-gradient(180deg, #fbfeff 0%, #eef9fc 100%);
+            padding: 16px;
+        }
+
+        .room-dropzone.is-active {
+            border-color: #1d86a6;
+            background: linear-gradient(180deg, #f2fcff 0%, #dff5fb 100%);
+        }
+
+        .room-drop-copy {
+            color: #55717f;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+
+        .room-preview-grid {
+            overflow-x: auto;
+            margin-bottom: 10px;
+        }
+
+        .seat-grid {
+            width: 100%;
+            min-width: 360px;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        .seat-grid th,
+        .seat-grid td {
+            border: 1px solid #dce9f0;
+            text-align: center;
+            padding: 10px 8px;
+        }
+
+        .seat-grid th {
+            background: #edf9fc;
+            color: #15516a;
+            font-size: 13px;
+        }
+
+        .seat-grid td {
+            min-width: 90px;
+            height: 46px;
+            color: #184c61;
+            font-weight: 700;
+        }
+
+        .seat-grid td.is-empty {
+            color: #9ab2bd;
+            font-weight: 600;
+        }
+
+        .room-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .room-summary span,
+        .planner-note {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #eaf7fb;
+            color: #15516a;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .room-assignments {
+            margin-top: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .room-assignment-card {
+            border: 1px solid #dbe8f1;
+            border-radius: 18px;
+            padding: 16px;
+            background: linear-gradient(180deg, #ffffff 0%, #f6fcfe 100%);
+        }
+
+        .room-assignment-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .room-assignment-head h4,
+        .room-assignment-head p {
+            margin: 0;
+        }
+
+        .room-assignment-head p {
+            color: #5f7b87;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .table-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .table-block {
+            border: 1px solid #dce9f0;
+            border-radius: 16px;
+            padding: 14px;
+            background: #fff;
+        }
+
+        .table-block-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .table-block-head strong,
+        .table-block-head span {
+            color: #15516a;
+            font-size: 14px;
+        }
+
+        .planner-empty {
+            padding: 28px;
+            border-radius: 22px;
+            border: 1px dashed #c7dee7;
+            text-align: center;
+            color: #5d7885;
+            background: linear-gradient(180deg, #fbfeff 0%, #f3fbfd 100%);
+        }
+
+        @keyframes plannerPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(35, 171, 212, 0.12);
+            }
+
+            50% {
+                box-shadow: 0 0 0 14px rgba(35, 171, 212, 0);
+            }
+        }
+
+        @keyframes plannerSweep {
+            0% {
+                transform: translateX(-130%);
+            }
+
+            100% {
+                transform: translateX(130%);
+            }
+        }
+
+        @keyframes plannerButtonBounce {
+            0% {
+                transform: scale(1);
+            }
+
+            35% {
+                transform: scale(0.93);
+            }
+
+            72% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
         @media (max-width: 960px) {
             .filter-layout {
                 grid-template-columns: 1fr;
@@ -383,6 +858,14 @@
 
             .hero-card h1 {
                 font-size: 28px;
+            }
+
+            .planner-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .planner-panel {
+                padding: 18px;
             }
         }
     </style>
@@ -413,6 +896,11 @@
                 <div class="meta-pill">Centres: {{ attendance_summary.centre_count }}</div>
                 <div class="meta-pill">Subjects: {{ attendance_summary.subject_count }}</div>
             </div>
+            <div class="planner-launch-wrap">
+                <button type="button" class="action-button planner-launch-btn" id="open-planner-btn">
+                    Generate Seating Arrangement
+                </button>
+            </div>
         </div>
 
         <div class="section-card">
@@ -436,7 +924,7 @@
                         </div>
                         <div class="selector-block">
                             <span class="selector-label">Total Students</span>
-                            <div class="student-total-display" id="selected-centre-total-pill">{{ attendance_summary.total_unique_rolls }}</div>
+                            <div class="student-total-display" id="selected-centre-total-pill" data-initial-count="{{ attendance_summary.total_unique_rolls|default:0 }}">{{ attendance_summary.total_unique_rolls|default:0 }}</div>
                         </div>
                     </div>
                 </div>
@@ -506,6 +994,76 @@
                 </div>
             </div>
         </div>
+
+        <div class="planner-modal" id="planner-modal" aria-hidden="true">
+            <div class="planner-panel">
+                <div class="planner-head">
+                    <div>
+                        <h2>Seating Arrangement Planner</h2>
+                        <p>
+                            Add rooms set rows and columns and then drag and drop subjects into each room you created.
+                        </p>
+                    </div>
+                    <button type="button" class="planner-close" id="close-planner-btn"
+                        aria-label="Close planner">&times;</button>
+                </div>
+
+                <div class="planner-layout">
+                    <div class="planner-sidebar">
+                        <div class="planner-box">
+                            <h3>Planner Overview</h3>
+                            <div class="planner-meta">
+                                <div class="planner-stat">
+                                    <span>Selected Centre</span>
+                                    <strong id="planner-centre-label">{{ attendance_summary.selected_centre }}</strong>
+                                </div>
+                                <div class="planner-stat">
+                                    <span>Total Students</span>
+                                    <strong id="planner-total-students" data-initial-count="{{ attendance_summary.total_unique_rolls|default:0 }}">{{ attendance_summary.total_unique_rolls|default:0 }}</strong>
+                                </div>
+                                <div class="planner-stat">
+                                    <span>Total Subjects</span>
+                                    <strong id="planner-total-subjects" data-initial-count="{{ attendance_summary.subject_count|default:0 }}">{{ attendance_summary.subject_count|default:0 }}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="planner-box">
+                            <h3>Subjects</h3>
+                            <p class="planner-help">Drag a subject card into any room below.</p>
+                            <div class="planner-subject-list" id="planner-subject-list"></div>
+                        </div>
+                    </div>
+
+                    <div class="planner-main">
+                        <div class="planner-box">
+                            <div class="planner-main-actions">
+                                <div>
+                                    <div class="planner-help" style="margin-bottom: 6px; font-weight: 700; color: #b45309;">Still in testing phase</div>
+                                    <h3 style="margin-bottom: 6px;">Room Builder</h3>
+                                    <div class="planner-help">Each room has one table. Overflow creates the next room
+                                        automatically.</div>
+                                </div>
+                                <div class="hero-actions" style="margin-top: 0;">
+                                    <button type="button" class="action-button dark planner-button-feedback"
+                                        id="add-room-btn">Add Room</button>
+                                    <button type="button" class="action-button dark planner-button-feedback"
+                                        id="download-seating-btn">Download Word File</button>
+                                    <button type="button" class="planner-secondary-btn" id="reset-planner-btn">Reset
+                                        Planner</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rooms-stack" id="rooms-stack">
+                            <div class="planner-empty" id="planner-empty-state">
+                                Add your first room, then drag a subject card into it to create the room table.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% else %}
         <div class="empty-state">
             <h2>Upload Required</h2>
@@ -518,7 +1076,9 @@
     </div>
 
     {% if attendance_summary %}
+    {{ attendance_summary.subjects|json_script:"initial-subject-details" }}
     <script>
+        const initialSubjectDetails = JSON.parse(document.getElementById("initial-subject-details").textContent);
         const subjectPicker = document.getElementById("subject-picker");
         const centrePicker = document.getElementById("centre-picker");
         const clearFilterBtn = document.getElementById("clear-filter-btn");
@@ -529,9 +1089,46 @@
         const downloadPdfBtn = document.getElementById("download-pdf-btn");
         const downloadExcelBtn = document.getElementById("download-excel-btn");
         const selectedCentreTotalPill = document.getElementById("selected-centre-total-pill");
+        const openPlannerBtn = document.getElementById("open-planner-btn");
+        const closePlannerBtn = document.getElementById("close-planner-btn");
+        const plannerModal = document.getElementById("planner-modal");
+        const plannerSubjectList = document.getElementById("planner-subject-list");
+        const plannerCentreLabel = document.getElementById("planner-centre-label");
+        const plannerTotalStudents = document.getElementById("planner-total-students");
+        const plannerTotalSubjects = document.getElementById("planner-total-subjects");
+        const addRoomBtn = document.getElementById("add-room-btn");
+        const downloadSeatingBtn = document.getElementById("download-seating-btn");
+        const resetPlannerBtn = document.getElementById("reset-planner-btn");
+        const roomsStack = document.getElementById("rooms-stack");
+        const plannerEmptyState = document.getElementById("planner-empty-state");
+
+        let plannerSubjects = initialSubjectDetails.map(item => ({
+            subject: item.subject,
+            roll_numbers: [...item.roll_numbers],
+            count: item.count
+        }));
+        let plannerRooms = [];
+        let plannerCurrentCentre = "{{ attendance_summary.selected_centre|escapejs }}";
 
         function getSelectedSubjects() {
             return Array.from(subjectPicker.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function getCsrfToken() {
+            const cookieValue = document.cookie
+                .split(";")
+                .map(item => item.trim())
+                .find(item => item.startsWith("csrftoken="));
+            return cookieValue ? decodeURIComponent(cookieValue.split("=")[1]) : "";
         }
 
         function buildFilterQuery() {
@@ -555,6 +1152,447 @@
 
         function renderSelectedCentreTotal(selectedCentre, studentCount) {
             selectedCentreTotalPill.textContent = studentCount;
+        }
+
+        function initializeStatValues() {
+            const centreCount = selectedCentreTotalPill.dataset.initialCount || "0";
+            const plannerStudentCount = plannerTotalStudents.dataset.initialCount || "0";
+            const plannerSubjectCount = plannerTotalSubjects.dataset.initialCount || "0";
+            selectedCentreTotalPill.textContent = centreCount;
+            plannerTotalStudents.textContent = plannerStudentCount;
+            plannerTotalSubjects.textContent = plannerSubjectCount;
+        }
+
+        function clonePlannerSubjects(subjects) {
+            return subjects.map(item => ({
+                subject: item.subject,
+                roll_numbers: [...item.roll_numbers],
+                count: item.count
+            }));
+        }
+
+        function createRoom(overrides = {}) {
+            return {
+                id: `room-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                name: "",
+                rows: 4,
+                columns: 5,
+                fillOrder: "column",
+                manualQueue: [],
+                autoCreated: false,
+                runtime: null,
+                ...overrides
+            };
+        }
+
+        function getRoomName(room, roomIndex) {
+            return room.name.trim() || `Room ${roomIndex + 1}`;
+        }
+
+        function getRoomCapacity(room) {
+            return Math.max((Number(room.rows) || 1) * (Number(room.columns) || 1), 1);
+        }
+
+        function getSeatOrder(rows, columns, fillOrder) {
+            const order = [];
+            if (fillOrder === "column") {
+                for (let columnIndex = 0; columnIndex < columns; columnIndex += 1) {
+                    for (let rowIndex = 0; rowIndex < rows; rowIndex += 1) {
+                        order.push({ rowIndex, columnIndex });
+                    }
+                }
+                return order;
+            }
+
+            for (let rowIndex = 0; rowIndex < rows; rowIndex += 1) {
+                for (let columnIndex = 0; columnIndex < columns; columnIndex += 1) {
+                    order.push({ rowIndex, columnIndex });
+                }
+            }
+            return order;
+        }
+
+        function renderSeatTable(grid, columnHeaders = []) {
+            const headerCells = grid[0].map((_, columnIndex) => `<th>${escapeHtml(columnHeaders[columnIndex] || `Column ${columnIndex + 1}`)}</th>`).join("");
+            const bodyRows = grid.map((row, rowIndex) => {
+                const cells = row.map(value => `<td class="${value ? "" : "is-empty"}">${value ? escapeHtml(value) : "&mdash;"}</td>`).join("");
+                return `<tr><th>Row ${rowIndex + 1}</th>${cells}</tr>`;
+            }).join("");
+            return `
+                <table class="seat-grid">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            ${headerCells}
+                        </tr>
+                    </thead>
+                    <tbody>${bodyRows}</tbody>
+                </table>
+            `;
+        }
+
+        function addRoom(overrides = {}) {
+            plannerRooms.push(createRoom(overrides));
+            renderPlanner();
+        }
+
+        function resetPlanner() {
+            plannerRooms = [];
+            renderPlanner();
+        }
+
+        function updateRoomField(roomId, field, value) {
+            const room = plannerRooms.find(item => item.id === roomId);
+            if (!room) {
+                return;
+            }
+            room[field] = field === "name" ? value : (field === "fillOrder" ? value : Math.max(Number(value) || 1, 1));
+            renderPlanner();
+        }
+
+        function assignSubjectToRoom(roomId, subjectName) {
+            const room = plannerRooms.find(item => item.id === roomId);
+            if (!room || room.manualQueue.includes(subjectName)) {
+                return;
+            }
+            room.manualQueue.push(subjectName);
+            renderPlanner();
+        }
+
+        function buildPlannerRuntime() {
+            const subjectPools = Object.fromEntries(
+                plannerSubjects.map(subject => [subject.subject, [...subject.roll_numbers]])
+            );
+
+            let roomIndex = 0;
+            let carryQueue = [];
+
+            while (roomIndex < plannerRooms.length || carryQueue.length) {
+                if (roomIndex >= plannerRooms.length) {
+                    const template = plannerRooms[plannerRooms.length - 1] || createRoom();
+                    plannerRooms.push(createRoom({
+                        rows: template.rows,
+                        columns: template.columns,
+                        fillOrder: template.fillOrder,
+                        autoCreated: true
+                    }));
+                }
+
+                const room = plannerRooms[roomIndex];
+                room.rows = Math.max(Number(room.rows) || 1, 1);
+                room.columns = Math.max(Number(room.columns) || 1, 1);
+
+                const seatOrder = getSeatOrder(room.rows, room.columns, room.fillOrder);
+                const grid = Array.from({ length: room.rows }, () => Array.from({ length: room.columns }, () => ""));
+                const columnSubjects = Array.from({ length: room.columns }, () => new Set());
+                const placements = [];
+                const effectiveQueue = [...carryQueue, ...room.manualQueue];
+                let seatCursor = 0;
+
+                carryQueue = [];
+
+                effectiveQueue.forEach(subjectName => {
+                    const remainingRolls = subjectPools[subjectName];
+                    if (!remainingRolls || !remainingRolls.length) {
+                        return;
+                    }
+
+                    if (seatCursor >= seatOrder.length) {
+                        carryQueue.push(subjectName);
+                        return;
+                    }
+
+                    const availableSeats = seatOrder.length - seatCursor;
+                    const assignedRolls = remainingRolls.splice(0, Math.min(availableSeats, remainingRolls.length));
+
+                    assignedRolls.forEach(roll => {
+                        const seat = seatOrder[seatCursor];
+                        grid[seat.rowIndex][seat.columnIndex] = roll;
+                        columnSubjects[seat.columnIndex].add(subjectName);
+                        seatCursor += 1;
+                    });
+
+                    if (assignedRolls.length) {
+                        placements.push({
+                            subject: subjectName,
+                            rolls: assignedRolls,
+                            count: assignedRolls.length
+                        });
+                    }
+
+                    if (remainingRolls.length) {
+                        carryQueue.push(subjectName);
+                    }
+                });
+
+                room.runtime = {
+                    grid,
+                    columnHeaders: columnSubjects.map((subjectSet, columnIndex) => {
+                        return subjectSet.size ? Array.from(subjectSet).join(" / ") : `Column ${columnIndex + 1}`;
+                    }),
+                    placements,
+                    assignedCount: placements.reduce((sum, item) => sum + item.count, 0),
+                    fillOrderLabel: room.fillOrder === "row" ? "Row first" : "Column first"
+                };
+
+                roomIndex += 1;
+            }
+
+            while (plannerRooms.length) {
+                const lastRoom = plannerRooms[plannerRooms.length - 1];
+                if (lastRoom.autoCreated && !lastRoom.manualQueue.length && (!lastRoom.runtime || !lastRoom.runtime.assignedCount)) {
+                    plannerRooms.pop();
+                    continue;
+                }
+                break;
+            }
+        }
+
+        function getSubjectAssignedCount(subjectName) {
+            return plannerRooms.reduce((count, room) => {
+                if (!room.runtime) {
+                    return count;
+                }
+                return count + room.runtime.placements
+                    .filter(item => item.subject === subjectName)
+                    .reduce((sum, item) => sum + item.count, 0);
+            }, 0);
+        }
+
+        function renderPlannerSubjects() {
+            plannerSubjectList.innerHTML = "";
+            plannerSubjects.forEach(subject => {
+                const assigned = getSubjectAssignedCount(subject.subject);
+                const remaining = Math.max(subject.roll_numbers.length - assigned, 0);
+                const card = document.createElement("div");
+                card.className = "planner-subject-card";
+                if (!remaining) {
+                    card.classList.add("is-complete");
+                }
+                card.draggable = remaining > 0;
+                card.dataset.subject = subject.subject;
+                card.innerHTML = `
+                    <strong>${escapeHtml(subject.subject)}</strong>
+                    <span>Total students: ${subject.roll_numbers.length}</span>
+                    <span>Placed: ${assigned}</span>
+                    <span>Remaining to start: ${remaining}</span>
+                `;
+                card.addEventListener("dragstart", event => {
+                    if (!remaining) {
+                        event.preventDefault();
+                        return;
+                    }
+                    event.dataTransfer.effectAllowed = "copy";
+                    event.dataTransfer.setData("text/plain", subject.subject);
+                });
+                plannerSubjectList.appendChild(card);
+            });
+        }
+
+        function renderRoomAssignments(room) {
+            if (!room.runtime || !room.runtime.placements.length) {
+                return `<div class="planner-help">No subject dropped yet. Drop a subject to fill this room table.</div>`;
+            }
+
+            return room.runtime.placements.map(placement => `
+                <div class="room-assignment-card">
+                    <div class="room-assignment-head">
+                        <div>
+                            <h4>${escapeHtml(placement.subject)}</h4>
+                            <p>${placement.count} students placed in this room</p>
+                        </div>
+                        <span class="planner-note">${placement.rolls[0]}${placement.rolls.length > 1 ? ` to ${placement.rolls[placement.rolls.length - 1]}` : ""}</span>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function renderRooms() {
+            roomsStack.innerHTML = "";
+            if (!plannerRooms.length) {
+                roomsStack.appendChild(plannerEmptyState);
+                return;
+            }
+
+            plannerRooms.forEach((room, roomIndex) => {
+                const roomCard = document.createElement("div");
+                roomCard.className = "room-card";
+                const previewGrid = room.runtime ? room.runtime.grid : Array.from({ length: Math.max(Number(room.rows) || 1, 1) }, () =>
+                    Array.from({ length: Math.max(Number(room.columns) || 1, 1) }, () => "")
+                );
+                const columnHeaders = room.runtime ? room.runtime.columnHeaders : Array.from({ length: Math.max(Number(room.columns) || 1, 1) }, (_, index) => `Column ${index + 1}`);
+                const isAutoRoom = room.autoCreated && !room.manualQueue.length;
+                roomCard.innerHTML = `
+                    <div class="room-head">
+                        <div>
+                            <h3>${escapeHtml(getRoomName(room, roomIndex))}</h3>
+                            <div class="room-subhead">${isAutoRoom ? "Auto-created because the previous room overflowed." : "Drop subjects into this room to fill its single table."}</div>
+                        </div>
+                        <div class="room-summary">
+                            <span>Capacity per table: ${getRoomCapacity(room)}</span>
+                        </div>
+                    </div>
+
+                    <div class="room-controls">
+                        <div class="room-control">
+                            <label for="${room.id}-name">Room name</label>
+                            <input id="${room.id}-name" type="text" value="${escapeHtml(room.name)}" placeholder="Room A">
+                        </div>
+                        <div class="room-control">
+                            <label for="${room.id}-rows">Rows</label>
+                            <input id="${room.id}-rows" type="number" min="1" value="${room.rows}">
+                        </div>
+                        <div class="room-control">
+                            <label for="${room.id}-columns">Columns</label>
+                            <input id="${room.id}-columns" type="number" min="1" value="${room.columns}">
+                        </div>
+                        <div class="room-control">
+                            <label for="${room.id}-order">Fill order</label>
+                            <select id="${room.id}-order">
+                                <option value="row" ${room.fillOrder === "row" ? "selected" : ""}>Row first</option>
+                                <option value="column" ${room.fillOrder === "column" ? "selected" : ""}>Column first</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="room-dropzone" data-room-drop="${room.id}">
+                        <div class="room-preview-grid">
+                            ${renderSeatTable(previewGrid, columnHeaders)}
+                        </div>
+                    </div>
+
+                    <div class="room-assignments">
+                        ${renderRoomAssignments(room)}
+                    </div>
+                `;
+
+                const nameInput = roomCard.querySelector(`#${CSS.escape(room.id)}-name`);
+                const rowsInput = roomCard.querySelector(`#${CSS.escape(room.id)}-rows`);
+                const columnsInput = roomCard.querySelector(`#${CSS.escape(room.id)}-columns`);
+                const orderSelect = roomCard.querySelector(`#${CSS.escape(room.id)}-order`);
+                const dropzone = roomCard.querySelector(`[data-room-drop="${room.id}"]`);
+
+                nameInput.addEventListener("input", event => updateRoomField(room.id, "name", event.target.value));
+                rowsInput.addEventListener("input", event => updateRoomField(room.id, "rows", event.target.value));
+                columnsInput.addEventListener("input", event => updateRoomField(room.id, "columns", event.target.value));
+                orderSelect.addEventListener("change", event => updateRoomField(room.id, "fillOrder", event.target.value));
+
+                dropzone.addEventListener("dragover", event => {
+                    event.preventDefault();
+                    roomCard.classList.add("is-drop-target");
+                    dropzone.classList.add("is-active");
+                });
+                dropzone.addEventListener("dragleave", () => {
+                    roomCard.classList.remove("is-drop-target");
+                    dropzone.classList.remove("is-active");
+                });
+                dropzone.addEventListener("drop", event => {
+                    event.preventDefault();
+                    roomCard.classList.remove("is-drop-target");
+                    dropzone.classList.remove("is-active");
+                    const subjectName = event.dataTransfer.getData("text/plain");
+                    if (subjectName) {
+                        assignSubjectToRoom(room.id, subjectName);
+                    }
+                });
+
+                roomsStack.appendChild(roomCard);
+            });
+        }
+
+        function renderPlanner() {
+            buildPlannerRuntime();
+            renderPlannerSubjects();
+            renderRooms();
+        }
+
+        function buildDownloadPayload() {
+            return {
+                centre: plannerCentreLabel.textContent || "",
+                rooms: plannerRooms
+                    .filter(room => room.runtime && room.runtime.assignedCount)
+                    .map((room, roomIndex) => ({
+                        name: getRoomName(room, roomIndex),
+                        rows: room.rows,
+                        columns: room.columns,
+                        fill_order_label: room.runtime.fillOrderLabel,
+                        column_headers: room.runtime.columnHeaders,
+                        grid: room.runtime.grid
+                    }))
+            };
+        }
+
+        function triggerButtonFeedback(button) {
+            if (!button) {
+                return;
+            }
+            button.classList.remove("is-clicked");
+            void button.offsetWidth;
+            button.classList.add("is-clicked");
+            window.setTimeout(() => {
+                button.classList.remove("is-clicked");
+            }, 420);
+        }
+
+        function downloadSeatingPlan() {
+            const payload = buildDownloadPayload();
+            if (!payload.rooms.length) {
+                window.alert("Please place at least one subject into a room before downloading the Word file.");
+                return;
+            }
+
+            fetch("{% url 'download_seating_docx' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCsrfToken()
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Word download failed");
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = "seating-arrangement.docx";
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch(error => {
+                    console.error(error);
+                    window.alert("Unable to download the Word file right now.");
+                });
+        }
+
+        function openPlanner() {
+            plannerModal.classList.add("is-open");
+            plannerModal.setAttribute("aria-hidden", "false");
+        }
+
+        function closePlanner() {
+            plannerModal.classList.remove("is-open");
+            plannerModal.setAttribute("aria-hidden", "true");
+        }
+
+        function refreshPlannerData(payload) {
+            const centreChanged = plannerCurrentCentre !== (payload.selected_centre || "");
+            plannerSubjects = clonePlannerSubjects(payload.all_subject_details || []);
+            plannerCentreLabel.textContent = payload.selected_centre || "-";
+            plannerTotalStudents.textContent = payload.selected_centre_student_count || 0;
+            plannerTotalSubjects.textContent = payload.subject_count || 0;
+            if (centreChanged) {
+                plannerCurrentCentre = payload.selected_centre || "";
+                resetPlanner();
+            } else {
+                renderPlanner();
+            }
         }
 
         function renderChips(subjects) {
@@ -643,6 +1681,7 @@
                     renderTable(data.subjects);
                     renderSubjectPicker(data.available_subjects);
                     renderSelectedCentreTotal(data.selected_centre, data.selected_centre_student_count);
+                    refreshPlannerData(data);
                     data.selected_subjects.forEach(subject => {
                         const input = subjectPicker.querySelector(`input[value="${CSS.escape(subject)}"]`);
                         if (input) {
@@ -668,6 +1707,30 @@
             });
             applyFilters();
         });
+        openPlannerBtn.addEventListener("click", openPlanner);
+        closePlannerBtn.addEventListener("click", closePlanner);
+        plannerModal.addEventListener("click", event => {
+            if (event.target === plannerModal) {
+                closePlanner();
+            }
+        });
+        addRoomBtn.addEventListener("click", () => {
+            triggerButtonFeedback(addRoomBtn);
+            addRoom();
+        });
+        downloadSeatingBtn.addEventListener("click", () => {
+            triggerButtonFeedback(downloadSeatingBtn);
+            downloadSeatingPlan();
+        });
+        resetPlannerBtn.addEventListener("click", resetPlanner);
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape" && plannerModal.classList.contains("is-open")) {
+                closePlanner();
+            }
+        });
+
+        initializeStatValues();
+        renderPlanner();
         updateDownloadLinks();
     </script>
     {% endif %}

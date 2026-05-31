@@ -1,5 +1,6 @@
 from datetime import datetime
 from io import BytesIO
+import json
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -7,6 +8,7 @@ from django.shortcuts import redirect, render
 from .result_parser import summarize_result_pdf
 from .attendance_pdf import generate_attendance_pdf
 from .seating import build_attendance_summary, build_filtered_attendance_summary, getting_all_subs, json_data, merge_rolls, sorted_centres
+from .seating_docx import generate_seating_docx
 from .summary_pdf import generate_summary_pdf
 from openpyxl import Workbook
 
@@ -43,6 +45,7 @@ def attendance_summary_payload(data, selected_centre=None, selected_subjects=Non
         "selected_centre_student_count": summary["total_unique_rolls"],
         "centres": summary["centres"],
         "available_subjects": [item["subject"] for item in summary["subjects"]],
+        "all_subject_details": summary["subjects"],
         "selected_subjects": summary["selected_subjects"],
         "subjects": summary["filtered_subjects"],
         "selected_rolls": summary["selected_rolls"],
@@ -199,4 +202,27 @@ def export_excel(request):
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
     response["Content-Disposition"] = f'attachment; filename="{file_name}"'
+    return response
+
+
+def download_seating_docx(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=405)
+
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"error": "Invalid planner payload."}, status=400)
+
+    rooms = payload.get("rooms") or []
+    centre_label = payload.get("centre") or "Selected Centre"
+    if not rooms:
+        return JsonResponse({"error": "No room layout available to export."}, status=400)
+
+    docx_bytes = generate_seating_docx(centre_label, rooms)
+    response = HttpResponse(
+        docx_bytes,
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    )
+    response["Content-Disposition"] = 'attachment; filename="seating-arrangement.docx"'
     return response

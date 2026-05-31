@@ -11,16 +11,28 @@
 </head>
 <style>
     .footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #f1f1f1; /* Light gray background */
-    text-align: center;
-    padding: 10px;
-    font-size: 14px;
-    z-index: 10;
-}
+        width: 100%;
+        background-color: #f1f1f1;
+        text-align: center;
+        padding: 18px 10px;
+        font-size: 14px;
+        margin-top: 28px;
+        box-sizing: border-box;
+    }
+
+    .page-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .page-main {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
 
 .warning {
             color: red;
@@ -33,8 +45,21 @@
 
 </style>
 <style>
-    .home-grid {
+    body {
+        display: block;
+        padding: 32px 20px 24px;
+    }
+
+    .upload-container.home-grid {
+        width: min(1100px, 100%);
         max-width: 1100px;
+        background: transparent;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+    }
+
+    .home-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 24px;
@@ -70,6 +95,10 @@
     }
 
     @media (max-width: 768px) {
+        body {
+            padding: 20px 12px;
+        }
+
         .home-grid {
             grid-template-columns: 1fr;
         }
@@ -77,41 +106,42 @@
 </style>
 
 <body>
-    <div class="upload-container home-grid">
-        <div class="tool-card">
-            <div class="tool-badge attendance-badge">Attendance PDF</div>
-            <div class="upload-icon">&#128194;</div>
-            <h1>Extract Roll Numbers</h1>
-            <p style="color: rgb(227, 116, 116); font-weight: bold;">
-                Only upload attendance sheets from the KU website with "AttendanceSheetsBySubnames" unchecked.
-            </p>
-            <form action="{% url 'Table_rollno' %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="file" id="attendance-file-input" name="file" required>
-                <button type="submit">Upload Attendance PDF</button>
-            </form>
-        </div>
+    <div class="page-shell">
+        <div class="page-main">
+            <div class="upload-container home-grid">
+                <div class="tool-card">
+                    <div class="tool-badge attendance-badge">Attendance PDF</div>
+                    <div class="upload-icon">&#128194;</div>
+                    <h1>Extract Roll Numbers</h1>
+                    <p style="color: rgb(227, 116, 116); font-weight: bold;">
+                        Only upload attendance sheets from the KU website with "AttendanceSheetsBySubnames" unchecked.
+                    </p>
+                    <form action="{% url 'Table_rollno' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" id="attendance-file-input" name="file" required>
+                        <button type="submit">Upload Attendance PDF</button>
+                    </form>
+                </div>
 
-        <div class="tool-card">
-            <div class="tool-badge result-badge">Result PDF</div>
-            <div class="upload-icon">&#128202;</div>
-            <h1>Calculate Pass Percentage</h1>
-            <p style="color: #555; font-weight: bold;">
-                Upload the result PDF to see subject-wise passed students and pass percentage summary.
-            </p>
-            <form action="{% url 'result_summary' %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="file" id="result-file-input" name="file" required>
-                <button type="submit">Upload Result PDF</button>
-            </form>
+                <div class="tool-card">
+                    <div class="tool-badge result-badge">Result PDF</div>
+                    <div class="upload-icon">&#128202;</div>
+                    <h1>Calculate Pass Percentage</h1>
+                    <p style="color: #555; font-weight: bold;">
+                        Upload the result PDF to see subject-wise passed students and pass percentage summary.
+                    </p>
+                    <form action="{% url 'result_summary' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" id="result-file-input" name="file" required>
+                        <button type="submit">Upload Result PDF</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 MB,GDC Zainapora All Rights Reserved.</p>
+            <p>Contact No: 9103295487</p>
         </div>
     </div>
-   
 </body>
-<div class="footer">
-    <!-- <p>Attendance Sheet Generated on {{current_date_time}}</p> -->
-    <p> &copy; 2025 MB,GDC Zainapora All Rights Reserved.</p>
-    <p> Contact No: 9103295487 </p>
-   
-</div>
 </html>
