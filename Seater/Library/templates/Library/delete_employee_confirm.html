@@ -1,0 +1,23 @@
+{% extends "Library/base.html" %}
+{% block title %}Confirm Employee Delete{% endblock %}
+{% block content %}
+<section class="dashboard-heading">
+    <div>
+        <p class="eyebrow">Admin action</p>
+        <h1>Delete employee</h1>
+    </div>
+    <a class="button secondary" href="{% url 'library_admin_dashboard' %}">Cancel</a>
+</section>
+
+<section class="panel captcha-panel">
+    <h2>{{ employee_to_delete.full_name }}</h2>
+    <p class="muted">This will delete the employee account and {{ book_count }} book record{{ book_count|pluralize }} entered by this employee.</p>
+    <form method="post" class="stack-form">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button class="danger" type="submit">Delete employee</button>
+            <a class="button secondary" href="{% url 'library_admin_dashboard' %}">Keep employee</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

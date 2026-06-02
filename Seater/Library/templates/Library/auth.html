@@ -1,0 +1,49 @@
+{% extends "Library/base.html" %}
+{% block title %}Library Employee Login{% endblock %}
+{% block content %}
+<section class="auth-layout">
+    <div class="auth-intro">
+        <p class="eyebrow">Employee access</p>
+        <h1>Library book entry</h1>
+        <p>Register or log in at this private library URL to add, update, and review the college book records.</p>
+        <a class="button secondary" href="{% url 'library_all_books' %}">View all books</a>
+    </div>
+    <div class="auth-panels">
+        <section class="panel">
+            <h2>Login</h2>
+            <form action="{% url 'library_login' %}" method="post" class="stack-form">
+                {% csrf_token %}
+                {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+                {{ login_form.non_field_errors }}
+                <label for="{{ login_form.email.id_for_label }}">Email address</label>
+                {{ login_form.email }}
+                {{ login_form.email.errors }}
+                <label for="{{ login_form.password.id_for_label }}">Password</label>
+                {{ login_form.password }}
+                {{ login_form.password.errors }}
+                <button type="submit">Login</button>
+            </form>
+        </section>
+        <section class="panel">
+            <h2>Register employee</h2>
+            <form action="{% url 'library_register' %}" method="post" class="stack-form">
+                {% csrf_token %}
+                {{ registration_form.non_field_errors }}
+                <label for="{{ registration_form.first_name.id_for_label }}">First name</label>
+                {{ registration_form.first_name }}
+                {{ registration_form.first_name.errors }}
+                <label for="{{ registration_form.last_name.id_for_label }}">Last name</label>
+                {{ registration_form.last_name }}
+                {{ registration_form.last_name.errors }}
+                <label for="{{ registration_form.email.id_for_label }}">Email address</label>
+                {{ registration_form.email }}
+                {{ registration_form.email.errors }}
+                <label for="{{ registration_form.password.id_for_label }}">Password</label>
+                {{ registration_form.password }}
+                {{ registration_form.password.errors }}
+                <button type="submit">Register and enter books</button>
+            </form>
+        </section>
+    </div>
+</section>
+{% endblock %}

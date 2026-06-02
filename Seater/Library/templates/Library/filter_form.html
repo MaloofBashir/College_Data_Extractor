@@ -1,0 +1,19 @@
+<form method="get" class="filter-form">
+    <div class="field">
+        <label for="q">Search title, author, accession, locker, subject</label>
+        <input id="q" name="q" type="search" value="{{ query }}" placeholder="Type any book detail">
+    </div>
+    <div class="field">
+        <label for="subject">Subject</label>
+        <select id="subject" name="subject">
+            <option value="">All subjects</option>
+            {% for subject in subjects %}
+                <option value="{{ subject }}" {% if selected_subject == subject %}selected{% endif %}>{{ subject }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-actions">
+        <button type="submit">Filter</button>
+        <button class="secondary" type="button" data-clear-filter>Clear</button>
+    </div>
+</form>

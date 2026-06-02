@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Library Books{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'Library/css/library.css' %}">
+</head>
+<body>
+    <header class="library-header">
+        <a class="brand" href="{% url 'library_dashboard' %}">Library Books</a>
+        {% if employee %}
+            <nav class="top-actions" aria-label="Library navigation">
+                <a href="{% url 'library_dashboard' %}">Dashboard</a>
+                <a href="{% url 'library_all_books' %}">Recorded books</a>
+                {% if employee.is_admin %}<a href="{% url 'library_admin_dashboard' %}">Admin</a>{% endif %}
+                <a href="{% url 'library_logout' %}">Logout</a>
+            </nav>
+        {% endif %}
+    </header>
+    <main class="library-shell">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p class="message">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

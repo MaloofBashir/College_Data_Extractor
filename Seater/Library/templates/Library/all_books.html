@@ -1,0 +1,90 @@
+{% extends "Library/base.html" %}
+{% block title %}All Library Books{% endblock %}
+{% block content %}
+<section class="dashboard-heading">
+    <div>
+        <p class="eyebrow">Search and filter</p>
+        <h1>{% if show_all_books %}All library books{% else %}Your recorded books{% endif %}</h1>
+    </div>
+    {% if employee %}
+        <a class="button secondary" href="{% url 'library_dashboard' %}">Back to dashboard</a>
+    {% else %}
+        <a class="button secondary" href="{% url 'library_home' %}">Login or register</a>
+    {% endif %}
+</section>
+
+<section class="stats-grid" aria-label="Library book totals">
+    <div class="stat-card">
+        <span>Total book records</span>
+        <strong>{{ total_books }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Matching records</span>
+        <strong data-filter-count>{{ total_books }}</strong>
+    </div>
+</section>
+
+<section class="panel live-book-panel" data-live-book-filter>
+    {% include "Library/filter_form.html" %}
+    {% include "Library/book_table.html" with books=all_books show_actions=employee.is_admin empty_text="No books match this filter." %}
+</section>
+<script>
+    (() => {
+        const panel = document.querySelector("[data-live-book-filter]");
+        if (!panel) return;
+
+        const searchInput = panel.querySelector("#q");
+        const subjectSelect = panel.querySelector("#subject");
+        const clearButton = panel.querySelector("[data-clear-filter]");
+        const form = panel.querySelector("form");
+        const rows = Array.from(panel.querySelectorAll("[data-book-row]"));
+        const serverEmptyRow = panel.querySelector("[data-server-empty]");
+        const emptyRow = panel.querySelector("[data-filter-empty]");
+        const countTarget = document.querySelector("[data-filter-count]");
+
+        function normalize(value) {
+            return (value || "").trim().toLowerCase();
+        }
+
+        function applyFilter() {
+            const query = normalize(searchInput.value);
+            const subject = normalize(subjectSelect.value);
+            let visibleCount = 0;
+
+            if (rows.length === 0) {
+                if (serverEmptyRow) serverEmptyRow.hidden = false;
+                if (emptyRow) emptyRow.hidden = true;
+                if (countTarget) countTarget.textContent = "0";
+                return;
+            }
+
+            if (serverEmptyRow) serverEmptyRow.hidden = true;
+
+            rows.forEach((row) => {
+                const matchesQuery = !query || row.dataset.search.includes(query);
+                const matchesSubject = !subject || normalize(row.dataset.subject) === subject;
+                const isVisible = matchesQuery && matchesSubject;
+                row.hidden = !isVisible;
+                if (isVisible) visibleCount += 1;
+            });
+
+            if (emptyRow) emptyRow.hidden = visibleCount > 0;
+            if (countTarget) countTarget.textContent = visibleCount;
+        }
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            applyFilter();
+        });
+        searchInput.addEventListener("input", applyFilter);
+        subjectSelect.addEventListener("change", applyFilter);
+        clearButton.addEventListener("click", () => {
+            searchInput.value = "";
+            subjectSelect.value = "";
+            applyFilter();
+            searchInput.focus();
+        });
+        applyFilter();
+    })();
+</script>
+{% endblock %}

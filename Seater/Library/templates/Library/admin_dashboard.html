@@ -1,0 +1,90 @@
+{% extends "Library/base.html" %}
+{% block title %}Library Admin Dashboard{% endblock %}
+{% block content %}
+<section class="dashboard-heading">
+    <div>
+        <p class="eyebrow">Admin reporting</p>
+        <h1>Library admin dashboard</h1>
+    </div>
+    <a class="button" href="{% url 'library_export_books_excel' %}">Download Excel report</a>
+</section>
+
+<section class="stats-grid" aria-label="Library admin totals">
+    <div class="stat-card">
+        <span>Total book records</span>
+        <strong>{{ total_books }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Employees</span>
+        <strong>{{ employee_total }}</strong>
+    </div>
+</section>
+
+<section class="admin-grid">
+    <div class="panel">
+        <h2>Books by locker</h2>
+        <div class="table-wrap">
+            <table class="summary-table">
+                <thead><tr><th>Locker</th><th>Records</th></tr></thead>
+                <tbody>
+                    {% for item in locker_counts %}
+                        <tr><td>{{ item.locker_no }}</td><td>{{ item.book_count }}</td></tr>
+                    {% empty %}
+                        <tr><td colspan="2">No books recorded yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="panel">
+        <h2>Books by subject</h2>
+        <div class="table-wrap">
+            <table class="summary-table">
+                <thead><tr><th>Subject</th><th>Records</th></tr></thead>
+                <tbody>
+                    {% for item in subject_counts %}
+                        <tr><td>{{ item.subject }}</td><td>{{ item.book_count }}</td></tr>
+                    {% empty %}
+                        <tr><td colspan="2">No books recorded yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="panel admin-section">
+    <h2>Entries by employee</h2>
+    <div class="table-wrap">
+        <table class="summary-table">
+            <thead><tr><th>Employee</th><th>Email</th><th>Records</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for item in employee_counts %}
+                    <tr>
+                        <td>{{ item.full_name }}</td>
+                        <td>{{ item.email }}</td>
+                        <td>{{ item.book_count }}</td>
+                        <td>
+                            {% if item.id != employee.id %}
+                                <a class="button danger compact" href="{% url 'library_delete_employee' item.id %}">Delete</a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4">No employees registered yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel admin-section">
+    <div class="section-row">
+        <h2>Manage all books</h2>
+        <a class="button secondary" href="{% url 'library_all_books' %}">Open recorded books</a>
+    </div>
+    {% include "Library/book_table.html" with books=all_books show_actions=True empty_text="No books recorded yet." %}
+</section>
+{% endblock %}

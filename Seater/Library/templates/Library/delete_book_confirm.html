@@ -1,0 +1,25 @@
+{% extends "Library/base.html" %}
+{% block title %}Confirm Delete{% endblock %}
+{% block content %}
+<section class="dashboard-heading">
+    <div>
+        <p class="eyebrow">Captcha verification</p>
+        <h1>Delete book</h1>
+    </div>
+    <a class="button secondary" href="{% url 'library_dashboard' %}">Cancel</a>
+</section>
+
+<section class="panel captcha-panel">
+    <h2>{{ book.title }}</h2>
+    <p class="muted">Enter the captcha answer to delete this book record.</p>
+    <form method="post" class="stack-form">
+        {% csrf_token %}
+        <label for="captcha_answer">What is {{ first_number }} + {{ second_number }}?</label>
+        <input id="captcha_answer" name="captcha_answer" inputmode="numeric" autocomplete="off" required>
+        <div class="form-actions">
+            <button class="danger" type="submit">Delete book</button>
+            <a class="button secondary" href="{% url 'library_dashboard' %}">Keep book</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

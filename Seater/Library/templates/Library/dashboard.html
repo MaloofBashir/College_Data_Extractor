@@ -1,0 +1,66 @@
+{% extends "Library/base.html" %}
+{% block title %}Library Dashboard{% endblock %}
+{% block content %}
+<section class="dashboard-heading">
+    <div>
+        <p class="eyebrow">Logged in as {{ employee.full_name }}</p>
+        <h1>Library dashboard</h1>
+    </div>
+    <a class="button secondary" href="{% url 'library_all_books' %}">Open recorded books</a>
+</section>
+
+<section class="panel entry-panel">
+    <h2>{% if edit_book %}Update book{% else %}Add book{% endif %}</h2>
+    <form method="post" class="book-form">
+        {% csrf_token %}
+        {% if edit_book %}
+            <input type="hidden" name="book_id" value="{{ edit_book.id }}">
+        {% endif %}
+        <datalist id="author-suggestions">
+            {% for author in author_suggestions %}
+                <option value="{{ author }}"></option>
+            {% endfor %}
+        </datalist>
+        <datalist id="subject-suggestions">
+            {% for subject in subjects %}
+                <option value="{{ subject }}"></option>
+            {% endfor %}
+        </datalist>
+        {% for field in form %}
+            <div class="field {% if field.name == 'title' or field.name == 'author' or field.name == 'remarks' %}wide{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        {% endfor %}
+        <div class="form-actions">
+            <button type="submit">{% if edit_book %}Update book{% else %}Add book{% endif %}</button>
+            {% if edit_book %}
+                <a class="button secondary" href="{% url 'library_dashboard' %}">Cancel edit</a>
+            {% endif %}
+        </div>
+    </form>
+</section>
+
+<section class="dashboard-summary">
+    <div class="section-row">
+        <h2>Your entry totals</h2>
+        <a class="button secondary" href="{% url 'library_all_books' %}">Open recorded books</a>
+    </div>
+    {% include "Library/stats.html" %}
+</section>
+
+<section class="panel admin-section">
+    <div class="section-row">
+        <h2>Your books</h2>
+        <span class="muted">Latest 10 shown first</span>
+    </div>
+    {% include "Library/book_table.html" with books=visible_books show_actions=True empty_text="You have not added any books yet." %}
+    {% if remaining_books %}
+        <details class="book-dropdown">
+            <summary>Show remaining books</summary>
+            {% include "Library/book_table.html" with books=remaining_books show_actions=True empty_text="" %}
+        </details>
+    {% endif %}
+</section>
+{% endblock %}
