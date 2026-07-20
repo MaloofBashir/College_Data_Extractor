@@ -3,16 +3,29 @@ import random
 
 from django.http import HttpResponse
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.db.models import Count, Q, Sum
 from django.db.models.functions import Trim
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font
 
 from .forms import BookForm, EmployeeLoginForm, EmployeeRegistrationForm
 from .models import Book, Employee
+
+
+BULK_BOOK_HEADERS = ["Title", "Author", "Accession Number", "Locker No", "Subject", "Remarks"]
+BULK_BOOK_REQUIRED_HEADERS = {"Title", "Author", "Locker No", "Subject"}
+BULK_BOOK_FIELD_MAP = {
+    "Title": "title",
+    "Author": "author",
+    "Accession Number": "accession_number",
+    "Locker No": "locker_no",
+    "Subject": "subject",
+    "Remarks": "remarks",
+}
 
 
 def current_employee(request):
@@ -20,7 +33,11 @@ def current_employee(request):
     if not employee_id:
         return None
     try:
-        return Employee.objects.get(pk=employee_id)
+        employee = Employee.objects.get(pk=employee_id)
+        if not employee.is_active:
+            request.session.pop("library_employee_id", None)
+            return None
+        return employee
     except Employee.DoesNotExist:
         request.session.pop("library_employee_id", None)
         return None
@@ -136,7 +153,9 @@ def login_view(request):
     if form.is_valid():
         employee = Employee.objects.filter(email__iexact=form.cleaned_data["email"]).first()
         password = form.cleaned_data["password"]
-        if employee and (employee.check_password(password) or not employee.password_hash):
+        if employee and not employee.is_active:
+            form.add_error(None, "This account has been disabled. Contact the library admin.")
+        elif employee and (employee.check_password(password) or not employee.password_hash):
             if not employee.password_hash:
                 employee.set_password(password)
                 employee.save(update_fields=["password_hash"])
@@ -263,7 +282,7 @@ def delete_employee(request, employee_id):
     if request.method == "POST":
         employee_name = employee_to_delete.full_name or employee_to_delete.email
         employee_to_delete.delete()
-        messages.success(request, f"{employee_name} and their book records were deleted.")
+        messages.success(request, f"{employee_name} was deleted. Their book records were kept.")
         return redirect("library_admin_dashboard")
 
     return render(request, "Library/delete_employee_confirm.html", {
@@ -271,6 +290,23 @@ def delete_employee(request, employee_id):
         "employee_to_delete": employee_to_delete,
         "book_count": employee_to_delete.books.count(),
     })
+
+
+@require_admin
+def toggle_employee_status(request, employee_id):
+    if request.method != "POST":
+        return redirect("library_admin_dashboard")
+
+    employee_to_update = get_object_or_404(Employee, pk=employee_id)
+    if employee_to_update.id == request.library_employee.id:
+        messages.error(request, "You cannot disable your own admin account.")
+        return redirect("library_admin_dashboard")
+
+    employee_to_update.is_active = not employee_to_update.is_active
+    employee_to_update.save(update_fields=["is_active"])
+    state = "enabled" if employee_to_update.is_active else "disabled"
+    messages.success(request, f"{employee_to_update.full_name or employee_to_update.email} was {state}. Their book records were not changed.")
+    return redirect("library_admin_dashboard")
 
 
 def add_sheet(workbook, title, headers, rows):
@@ -286,6 +322,50 @@ def add_sheet(workbook, title, headers, rows):
         sheet.column_dimensions[column[0].column_letter].width = min(width, 42)
 
 
+def excel_response(workbook, filename):
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    workbook.save(response)
+    return response
+
+
+def normalize_excel_value(value):
+    if value is None:
+        return ""
+    return " ".join(str(value).strip().split())
+
+
+def extract_bulk_book_rows(worksheet):
+    header_values = [normalize_excel_value(cell.value) for cell in worksheet[1]]
+    header_lookup = {header: index for index, header in enumerate(header_values) if header}
+    missing_headers = [header for header in BULK_BOOK_HEADERS if header not in header_lookup]
+    if missing_headers:
+        raise ValidationError(f"Missing column(s): {', '.join(missing_headers)}.")
+
+    rows = []
+    errors = []
+    for row_number, row in enumerate(worksheet.iter_rows(min_row=2, values_only=True), start=2):
+        values = {
+            header: normalize_excel_value(row[header_lookup[header]]) if header_lookup[header] < len(row) else ""
+            for header in BULK_BOOK_HEADERS
+        }
+        if not any(values.values()):
+            continue
+
+        missing_values = [header for header in BULK_BOOK_REQUIRED_HEADERS if not values[header]]
+        if missing_values:
+            errors.append(f"Row {row_number}: missing {', '.join(missing_values)}.")
+            continue
+
+        rows.append({
+            "row_number": row_number,
+            "data": {field: values[header] for header, field in BULK_BOOK_FIELD_MAP.items()},
+        })
+    return rows, errors
+
+
 @require_admin
 def export_books_excel(request):
     workbook = Workbook()
@@ -297,7 +377,9 @@ def export_books_excel(request):
     ], [
         [
             book.title, book.author, book.accession_number, book.locker_no, book.subject,
-            book.remarks, book.added_by.full_name, book.added_by.email,
+            book.remarks,
+            book.added_by.full_name if book.added_by else "Deleted user",
+            book.added_by.email if book.added_by else "",
             book.created_at.strftime("%Y-%m-%d %H:%M"), book.updated_at.strftime("%Y-%m-%d %H:%M"),
         ]
         for book in books
@@ -312,9 +394,72 @@ def export_books_excel(request):
     add_sheet(workbook, "By Employee", ["Employee", "Email", "Book Records"], [
         [item.full_name, item.email, item.book_count] for item in summary["employee_counts"]
     ])
-    response = HttpResponse(
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-    response["Content-Disposition"] = 'attachment; filename="library_books_report.xlsx"'
-    workbook.save(response)
-    return response
+    return excel_response(workbook, "library_books_report.xlsx")
+
+
+@require_admin
+def download_book_upload_template(request):
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "Books Upload"
+    sheet.append(BULK_BOOK_HEADERS)
+    sheet.append([
+        "Introduction to History",
+        "A. Writer",
+        "ACC-1001",
+        "L-12",
+        "History",
+        "Core reading",
+    ])
+    for cell in sheet[1]:
+        cell.font = Font(bold=True)
+    sheet.freeze_panes = "A2"
+    for column in sheet.columns:
+        width = max(len(str(cell.value or "")) for cell in column) + 2
+        sheet.column_dimensions[column[0].column_letter].width = min(width, 42)
+    return excel_response(workbook, "library_books_upload_format.xlsx")
+
+
+@require_admin
+def bulk_upload_books(request):
+    if request.method != "POST":
+        return redirect("library_admin_dashboard")
+
+    upload = request.FILES.get("books_file")
+    if not upload:
+        messages.error(request, "Choose an Excel file before uploading.")
+        return redirect("library_admin_dashboard")
+
+    if not upload.name.lower().endswith(".xlsx"):
+        messages.error(request, "Upload a .xlsx Excel file using the provided format.")
+        return redirect("library_admin_dashboard")
+
+    try:
+        workbook = load_workbook(upload, read_only=True, data_only=True)
+        rows, row_errors = extract_bulk_book_rows(workbook.active)
+    except Exception as exc:
+        messages.error(request, f"Could not read the Excel file. {exc}")
+        return redirect("library_admin_dashboard")
+
+    created_count = 0
+    for row in rows:
+        form = BookForm(row["data"])
+        if form.is_valid():
+            book = form.save(commit=False)
+            book.added_by = request.library_employee
+            book.save()
+            created_count += 1
+        else:
+            row_errors.append(f"Row {row['row_number']}: {'; '.join(form.errors.as_text().splitlines())}")
+
+    if created_count:
+        messages.success(request, f"{created_count} book record{'s' if created_count != 1 else ''} uploaded.")
+    if row_errors:
+        preview = " ".join(row_errors[:5])
+        remaining = len(row_errors) - 5
+        if remaining > 0:
+            preview = f"{preview} {remaining} more row{'s' if remaining != 1 else ''} need attention."
+        messages.error(request, preview)
+    if not created_count and not row_errors:
+        messages.error(request, "No book rows were found in the Excel file.")
+    return redirect("library_admin_dashboard")

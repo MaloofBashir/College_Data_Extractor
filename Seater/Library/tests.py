@@ -3,7 +3,7 @@ from io import BytesIO
 from django.http import Http404
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 
 from .forms import BookForm, EmployeeRegistrationForm
 from .models import Book, Employee
@@ -280,6 +280,63 @@ class LibraryWorkflowTests(TestCase):
         self.assertNotIn("ISBN / Book No", [cell.value for cell in workbook["All Books"][1]])
         self.assertNotIn("Publisher", [cell.value for cell in workbook["All Books"][1]])
 
+    def test_admin_can_download_bulk_upload_format(self):
+        self.employee.is_admin = True
+        self.employee.save(update_fields=["is_admin"])
+        self.login()
+
+        response = self.client.get(reverse("library_book_upload_template"))
+
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        workbook = load_workbook(filename=BytesIO(response.content))
+        self.assertEqual(workbook.sheetnames, ["Books Upload"])
+        self.assertEqual(
+            [cell.value for cell in workbook["Books Upload"][1]],
+            ["Title", "Author", "Accession Number", "Locker No", "Subject", "Remarks"],
+        )
+
+    def test_admin_can_bulk_upload_books_from_excel(self):
+        self.employee.is_admin = True
+        self.employee.save(update_fields=["is_admin"])
+        self.login()
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.append(["Title", "Author", "Accession Number", "Locker No", "Subject", "Remarks"])
+        sheet.append(["Introduction to History", "A. Writer", "ACC-1001", "L-12", "History", "Core reading"])
+        sheet.append(["Political Science", "B. Author", "", "L-14", "Political Science", ""])
+        upload = BytesIO()
+        workbook.save(upload)
+        upload.seek(0)
+        upload.name = "books.xlsx"
+
+        response = self.client.post(reverse("library_bulk_upload_books"), {"books_file": upload})
+
+        self.assertRedirects(response, reverse("library_admin_dashboard"), fetch_redirect_response=False)
+        self.assertEqual(Book.objects.count(), 2)
+        self.assertTrue(Book.objects.filter(title="Introduction to History", added_by=self.employee).exists())
+        self.assertTrue(Book.objects.filter(title="Political Science", accession_number="").exists())
+
+    def test_bulk_upload_reports_row_errors_without_importing_invalid_rows(self):
+        self.employee.is_admin = True
+        self.employee.save(update_fields=["is_admin"])
+        self.login()
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.append(["Title", "Author", "Accession Number", "Locker No", "Subject", "Remarks"])
+        sheet.append(["", "A. Writer", "ACC-1001", "L-12", "History", "Core reading"])
+        upload = BytesIO()
+        workbook.save(upload)
+        upload.seek(0)
+        upload.name = "books.xlsx"
+
+        response = self.client.post(reverse("library_bulk_upload_books"), {"books_file": upload}, follow=True)
+
+        self.assertEqual(Book.objects.count(), 0)
+        self.assertContains(response, "Row 2: missing Title.")
+
     def test_admin_can_delete_other_employees_book(self):
         self.employee.is_admin = True
         self.employee.save(update_fields=["is_admin"])
@@ -304,18 +361,53 @@ class LibraryWorkflowTests(TestCase):
         self.assertRedirects(response, reverse("library_admin_dashboard"), fetch_redirect_response=False)
         self.assertFalse(Book.objects.filter(pk=book.id).exists())
 
-    def test_admin_can_delete_employee_and_their_books(self):
+    def test_admin_can_delete_employee_without_deleting_their_books(self):
         self.employee.is_admin = True
         self.employee.save(update_fields=["is_admin"])
         self.login()
         other = Employee.objects.create(email="other@example.com", first_name="Other", last_name="Staff")
-        Book.objects.create(added_by=other, **self.book_payload())
+        book = Book.objects.create(added_by=other, **self.book_payload())
 
         response = self.client.post(reverse("library_delete_employee", args=[other.id]))
+        book.refresh_from_db()
 
         self.assertRedirects(response, reverse("library_admin_dashboard"), fetch_redirect_response=False)
         self.assertFalse(Employee.objects.filter(pk=other.id).exists())
-        self.assertFalse(Book.objects.exists())
+        self.assertTrue(Book.objects.filter(pk=book.id).exists())
+        self.assertIsNone(book.added_by)
+
+    def test_admin_can_disable_and_enable_employee_without_touching_books(self):
+        self.employee.is_admin = True
+        self.employee.save(update_fields=["is_admin"])
+        other = Employee.objects.create(email="other@example.com", first_name="Other", last_name="Staff")
+        other.set_password("StrongPass123!")
+        other.save(update_fields=["password_hash"])
+        book = Book.objects.create(added_by=other, **self.book_payload())
+        self.login()
+
+        response = self.client.post(reverse("library_toggle_employee_status", args=[other.id]))
+        other.refresh_from_db()
+        book.refresh_from_db()
+
+        self.assertRedirects(response, reverse("library_admin_dashboard"), fetch_redirect_response=False)
+        self.assertFalse(other.is_active)
+        self.assertEqual(book.added_by, other)
+
+        self.client.logout()
+        response = self.client.post(reverse("library_login"), {
+            "email": other.email,
+            "password": "StrongPass123!",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("library_employee_id", self.client.session)
+        self.assertContains(response, "This account has been disabled")
+
+        self.login()
+        response = self.client.post(reverse("library_toggle_employee_status", args=[other.id]))
+        other.refresh_from_db()
+
+        self.assertRedirects(response, reverse("library_admin_dashboard"), fetch_redirect_response=False)
+        self.assertTrue(other.is_active)
 
     def test_admin_cannot_delete_self(self):
         self.employee.is_admin = True
