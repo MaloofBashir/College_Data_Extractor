@@ -23,7 +23,7 @@
                     <td data-label="Subject">{{ book.subject }}</td>
                     <td data-label="Locker">{{ book.locker_no }}</td>
                     <td data-label="Remarks">{{ book.remarks|default:"-" }}</td>
-                    <td data-label="Added by">{% if book.added_by %}{{ book.added_by.full_name }}{% else %}Deleted user{% endif %}</td>
+                    <td data-label="Added by">{{ book.added_by.full_name }}</td>
                     {% if show_actions %}
                         <td data-label="Actions" class="row-actions">
                             {% if book.added_by_id == employee.id %}

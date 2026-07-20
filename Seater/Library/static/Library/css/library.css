@@ -165,23 +165,6 @@ button.secondary {
     margin-bottom: 20px;
 }
 
-.heading-actions,
-.upload-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-}
-
-.upload-form {
-    display: grid;
-    gap: 8px;
-}
-
-.upload-row input[type="file"] {
-    flex: 1 1 280px;
-}
-
 .messages {
     margin-bottom: 16px;
 }
@@ -437,14 +420,10 @@ textarea:focus {
 
     .top-actions,
     .top-actions a,
-    .heading-actions,
-    .heading-actions .button,
     .section-row .button,
     .dashboard-heading .button,
     .form-actions > *,
-    .filter-actions > *,
-    .upload-row,
-    .upload-row > * {
+    .filter-actions > * {
         width: 100%;
     }
 

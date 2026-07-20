@@ -6,10 +6,7 @@
         <p class="eyebrow">Admin reporting</p>
         <h1>Library admin dashboard</h1>
     </div>
-    <div class="heading-actions">
-        <a class="button secondary" href="{% url 'library_book_upload_template' %}">Download upload format</a>
-        <a class="button" href="{% url 'library_export_books_excel' %}">Download Excel report</a>
-    </div>
+    <a class="button" href="{% url 'library_export_books_excel' %}">Download Excel report</a>
 </section>
 
 <section class="stats-grid" aria-label="Library admin totals">
@@ -57,51 +54,26 @@
 </section>
 
 <section class="panel admin-section">
-    <div class="section-row">
-        <div>
-            <h2>Bulk upload books</h2>
-            <p class="muted">Use the Excel format with these columns: Title, Author, Accession Number, Locker No, Subject, Remarks.</p>
-        </div>
-        <a class="button secondary" href="{% url 'library_book_upload_template' %}">Get format</a>
-    </div>
-    <form class="upload-form" method="post" action="{% url 'library_bulk_upload_books' %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label for="books-file">Excel file (.xlsx)</label>
-        <div class="upload-row">
-            <input id="books-file" type="file" name="books_file" accept=".xlsx" required>
-            <button type="submit">Upload books</button>
-        </div>
-    </form>
-</section>
-
-<section class="panel admin-section">
     <h2>Entries by employee</h2>
     <div class="table-wrap">
         <table class="summary-table">
-            <thead><tr><th>Employee</th><th>Email</th><th>Status</th><th>Records</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Employee</th><th>Email</th><th>Records</th><th>Actions</th></tr></thead>
             <tbody>
                 {% for item in employee_counts %}
                     <tr>
                         <td>{{ item.full_name }}</td>
                         <td>{{ item.email }}</td>
-                        <td>{% if item.is_active %}Active{% else %}Disabled{% endif %}</td>
                         <td>{{ item.book_count }}</td>
                         <td>
                             {% if item.id != employee.id %}
-                                <div class="row-actions">
-                                    <form method="post" action="{% url 'library_toggle_employee_status' item.id %}">
-                                        {% csrf_token %}
-                                        <button class="button secondary compact" type="submit">{% if item.is_active %}Disable{% else %}Enable{% endif %}</button>
-                                    </form>
-                                    <a class="button danger compact" href="{% url 'library_delete_employee' item.id %}">Delete</a>
-                                </div>
+                                <a class="button danger compact" href="{% url 'library_delete_employee' item.id %}">Delete</a>
                             {% else %}
                                 -
                             {% endif %}
                         </td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="5">No employees registered yet.</td></tr>
+                    <tr><td colspan="4">No employees registered yet.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

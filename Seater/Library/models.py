@@ -9,7 +9,6 @@ class Employee(models.Model):
     email = models.EmailField(unique=True)
     password_hash = models.CharField(max_length=128, blank=True)
     is_admin = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -30,7 +29,7 @@ class Employee(models.Model):
 
 
 class Book(models.Model):
-    added_by = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name="books")
+    added_by = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="books")
     title = models.CharField(max_length=255)
     author = models.CharField(max_length=180)
     accession_number = models.CharField(max_length=80, blank=True)
